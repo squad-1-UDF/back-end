@@ -1,0 +1,9 @@
+services:
+  api:
+    build: .
+    env_file: .env
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Sem serviço 'db': PostgreSQL é responsabilidade da outra equipe.
