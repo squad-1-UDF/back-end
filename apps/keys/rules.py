@@ -55,10 +55,15 @@ type KeyMovement = KeyCheckout | KeyReturn
 
 def _replay_history(
     history: tuple[KeyMovement, ...],
-) -> tuple[set[Hashable], dict[Hashable, KeyCheckout], set[Hashable], datetime | None]:
-    used_loans: set[Hashable] = set()
+) -> tuple[
+    dict[Hashable, KeyCheckout],
+    dict[Hashable, KeyCheckout],
+    dict[Hashable, KeyCheckout],
+    datetime | None,
+]:
+    checkouts_by_ref: dict[Hashable, KeyCheckout] = {}
     active_loans: dict[Hashable, KeyCheckout] = {}
-    active_keys: set[Hashable] = set()
+    active_by_key: dict[Hashable, KeyCheckout] = {}
     latest_at: datetime | None = None
 
     for movement in history:
@@ -70,21 +75,21 @@ def _replay_history(
         latest_at = occurred_at
 
         if isinstance(movement, KeyCheckout):
-            if movement.loan_ref in used_loans:
+            if movement.loan_ref in checkouts_by_ref:
                 raise ValueError("Empréstimo duplicado no histórico.")
-            if movement.key_ref in active_keys:
+            if movement.key_ref in active_by_key:
                 raise ValueError("Chave com mais de um empréstimo ativo.")
-            used_loans.add(movement.loan_ref)
+            checkouts_by_ref[movement.loan_ref] = movement
             active_loans[movement.loan_ref] = movement
-            active_keys.add(movement.key_ref)
+            active_by_key[movement.key_ref] = movement
         elif isinstance(movement, KeyReturn):
             checkout = active_loans.get(movement.loan_ref)
             if checkout is None:
                 raise ValueError("Devolução sem empréstimo ativo no histórico.")
             del active_loans[movement.loan_ref]
-            active_keys.remove(checkout.key_ref)
+            del active_by_key[checkout.key_ref]
 
-    return used_loans, active_loans, active_keys, latest_at
+    return checkouts_by_ref, active_loans, active_by_key, latest_at
 
 
 def register_checkout(
@@ -98,12 +103,12 @@ def register_checkout(
     """Adiciona retirada se a chave não tem empréstimo ativo."""
     checkout = KeyCheckout(loan_ref, key_ref, responsible_ref, occurred_at)
     movements = tuple(history)
-    used_loans, _, active_keys, latest_at = _replay_history(movements)
+    checkouts_by_ref, _, active_by_key, latest_at = _replay_history(movements)
     if latest_at is not None and _as_utc(checkout.occurred_at) < latest_at:
         raise ValueError("Retirada anterior ao último registro do histórico.")
-    if checkout.loan_ref in used_loans:
+    if checkout.loan_ref in checkouts_by_ref:
         raise ValueError("Referência de empréstimo já utilizada.")
-    if checkout.key_ref in active_keys:
+    if checkout.key_ref in active_by_key:
         raise ValueError("Chave indisponível: empréstimo ativo.")
     return (*movements, checkout)
 
@@ -126,3 +131,37 @@ def register_return(
     if latest_at is not None and _as_utc(key_return.occurred_at) < latest_at:
         raise ValueError("Devolução anterior ao último registro do histórico.")
     return (*movements, key_return)
+
+
+def active_loan_ref_for_key(
+    history: Iterable[KeyMovement], key_ref: Hashable
+) -> Hashable | None:
+    """Retorna a referência do empréstimo ativo da chave, se existir."""
+    _validate_ref(key_ref, "Chave")
+    _, _, active_by_key, _ = _replay_history(tuple(history))
+    checkout = active_by_key.get(key_ref)
+    return None if checkout is None else checkout.loan_ref
+
+
+def has_active_loan(history: Iterable[KeyMovement], key_ref: Hashable) -> bool:
+    """Indica apenas ausência ou presença de empréstimo ativo da chave."""
+    return active_loan_ref_for_key(history, key_ref) is not None
+
+
+def movements_for_key(
+    history: Iterable[KeyMovement], key_ref: Hashable
+) -> tuple[KeyMovement, ...]:
+    """Filtra retiradas e respectivas devoluções, preservando a ordem."""
+    _validate_ref(key_ref, "Chave")
+    movements = tuple(history)
+    checkouts_by_ref, _, _, _ = _replay_history(movements)
+    selected: list[KeyMovement] = []
+    for movement in movements:
+        checkout = (
+            movement
+            if isinstance(movement, KeyCheckout)
+            else checkouts_by_ref[movement.loan_ref]
+        )
+        if checkout.key_ref == key_ref:
+            selected.append(movement)
+    return tuple(selected)
