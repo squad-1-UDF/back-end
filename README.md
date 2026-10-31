@@ -45,6 +45,10 @@ python manage.py check --deploy
 
 Com Docker ativo e `.env` criado, execute `docker compose up --build`. A API ficará em `http://localhost:8000/api/v1/health/`. A imagem executa o processo como usuário sem privilégios. O Compose não cria PostgreSQL nem aplica migrations. Se o PostgreSQL estiver na máquina hospedeira, use `DB_HOST=host.docker.internal` no `.env` para o contêiner alcançá-lo; `localhost` dentro do contêiner aponta para o próprio contêiner. Se o banco estiver em outro servidor, use o endereço fornecido pela equipe de banco.
 
+## Integração contínua
+
+O workflow `.github/workflows/ci.yml` roda em pull requests para `main` e em pushes na `main`. Ele instala as dependências de desenvolvimento no Python 3.13 e executa `pip check`, Ruff, `manage.py check` e pytest. Cada execução gera sua própria `DJANGO_SECRET_KEY`; `DB_NAME` fica vazio, sem PostgreSQL ou migrations na CI inicial.
+
 ## Próxima etapa
 
 UC001 (login) depende da definição conjunta de tabela de usuários, perfis e mecanismo de autenticação (sessão ou token). O contrato proposto e as decisões pendentes estão em [docs/REQUISITOS_E_CONTRATO.md](docs/REQUISITOS_E_CONTRATO.md). Não há schema ou migrations de domínio nesta branch.
