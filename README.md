@@ -1,6 +1,6 @@
 # Sistema de Gestão de Laboratórios e Salas — API
 
-Scaffold da API em Python 3.13, Django 5.2 e Django REST Framework. Esta etapa oferece apenas `GET /api/v1/health/`, que responde `{"status":"ok","service":"labtech-api"}`. O endpoint verifica o processo HTTP, não a conexão com o banco. As apps `accounts`, `spaces`, `keys` e `bookings` ainda não têm models nem endpoints de domínio.
+Scaffold da API em Python 3.13, Django 5.2 e Django REST Framework. `GET /api/v1/health/` responde `{"status":"ok","service":"labtech-api"}` e verifica apenas o processo HTTP. UC001 oferece `GET /api/v1/auth/csrf/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/logout/` e `GET /api/v1/auth/me/` com sessões Django provisórias. As apps ainda não têm models nem endpoints de domínio.
 
 ## Preparar o ambiente local
 
@@ -25,7 +25,7 @@ Scaffold da API em Python 3.13, Django 5.2 e Django REST Framework. Esta etapa o
    python manage.py runserver
    ```
 
-   Acesse `http://127.0.0.1:8000/api/v1/health/`. Outros endpoints de negócio ainda não existem.
+   Acesse `http://127.0.0.1:8000/api/v1/health/`. As rotas HTTP de UC001 existem, mas login e persistência de sessão exigem banco de usuários e sessões configurado; outros endpoints de negócio ainda não existem.
 
 ## Verificações
 
@@ -51,6 +51,6 @@ O workflow `.github/workflows/ci.yml` roda em pull requests para `main` e em pus
 
 ## Próxima etapa
 
-UC001 (login) depende da definição conjunta de tabela de usuários, perfis e mecanismo de autenticação (sessão ou token). O contrato proposto e as decisões pendentes estão em [docs/REQUISITOS_E_CONTRATO.md](docs/REQUISITOS_E_CONTRATO.md). Não há schema ou migrations de domínio nesta branch.
+UC001 tem uma camada HTTP com sessões Django provisórias e rota pública para obter o cookie CSRF, sem schema ou migrations de usuário. A integração real de identidade, sessão e banco ainda depende de decisão. O fluxo de cookies e cabeçalho `X-CSRFToken`, além das pendências de CORS para origens distintas, estão em [docs/API_CONTRATOS_MVP.md](docs/API_CONTRATOS_MVP.md). Consulte também [docs/REQUISITOS_E_CONTRATO.md](docs/REQUISITOS_E_CONTRATO.md).
 
 Licença: [GNU GPL v3](LICENSE).

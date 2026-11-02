@@ -1,6 +1,6 @@
 # Proposta de contratos HTTP do LabTech
 
-**Estado:** documento para discussão, sem implementação. A única rota existente nesta base é `GET /api/v1/health/`, que confirma somente que o processo HTTP responde. Nenhuma rota abaixo, exceto essa, existe no código. Consulte [requisitos e contrato inicial](REQUISITOS_E_CONTRATO.md).
+**Estado:** proposta para discussão. UC001 tem uma primeira camada HTTP com sessões Django e obtenção de cookie CSRF, ainda provisória e sem integração com banco de usuários. As demais rotas abaixo não estão implementadas. `GET /api/v1/health/` confirma apenas que o processo HTTP responde. Consulte [requisitos e contrato inicial](REQUISITOS_E_CONTRATO.md).
 
 ## Origem e nível de certeza
 
@@ -9,22 +9,33 @@
 | Requisitos UC001–UC009 | Login; manutenção de usuários, salas/laboratórios e chaves; entrega e devolução de chave; consulta de disponibilidade e histórico de chave; emissão de histórico (UC009, P3). Funções restritas exigem autenticação e permissões. Salas têm identificação única; chaves pertencem a um espaço; entrega exige chave disponível e registra responsável e data/hora; devolução corresponde à entrega; o histórico é preservado. |
 | Proposta de MVP do grupo | Login, dashboard, salas, agenda, reservas, minhas reservas e administração. Conflito de horários e cancelamento de reserva **ainda não foram incorporados aos requisitos escritos**. |
 | Regras puras integradas à main | [PR #2](https://github.com/squad-1-UDF/back-end/pull/2): intervalos de reserva `[início, fim)`, sem conflito quando consecutivos; filtro por espaço e estado ativo fica com o chamador. [PR #3](https://github.com/squad-1-UDF/back-end/pull/3): retirada/devolução e histórico de eventos. [PR #4](https://github.com/squad-1-UDF/back-end/pull/4): empréstimo ativo e movimentações por chave; ausência de empréstimo ativo não garante disponibilidade física ou administrativa. Essas PRs não são endpoints nem schema aprovado. |
-| Este documento | Métodos, caminhos, nomes de campos, formas de resposta e códigos de erro abaixo são **propostas**, sujeitos à aprovação do Front-end, da equipe de banco e do grupo. |
+| Este documento | UC001 descreve o comportamento HTTP implementado provisoriamente. Os demais métodos, caminhos, campos, respostas e erros são **propostas**, sujeitos à aprovação do Front-end, da equipe de banco e do grupo. |
 
 ## Convenções propostas para leitura dos exemplos
 
 - Prefixo `/api/v1/`; identificadores como `u1`, `s1`, `k1`, `l1` e `b1` são referências **opacas ilustrativas**, sem escolha de PK, tabela ou tipo definitivo. Campos JSON exibidos servem para discutir o contrato; **não estabelecem campos obrigatórios finais**.
 - Horários usam strings ISO 8601 com offset, por exemplo `2026-10-30T10:00:00-03:00`. O nome dos campos, a zona de apresentação, quem fornece o horário e a precisão serão acordados. As regras puras rejeitam datetimes sem timezone.
-- `Público` significa sem sessão/token. `Autenticado` é a proposta para leitura e operações de domínio; a configuração DRF atual exige autenticação por padrão, mas não define as permissões finais. `Gestão a definir` e `escopo próprio/a definir` indicam **autorização pendente**, sem inventar papéis. Para UC001, sessão (com cookie/CSRF) versus token ainda não foi decidido.
-- Nos quadros, `—` em entrada significa sem corpo JSON. `401` (não autenticado) e `403` (sem permissão) são respostas propostas para todas as rotas autenticadas, além dos erros específicos indicados. Listas e envelopes JSON são apenas exemplos; paginação ainda não foi definida.
+- `Público` significa sem sessão/token. `Autenticado` é a proposta para leitura e operações de domínio; a configuração DRF atual exige autenticação por padrão, mas não define as permissões finais. `Gestão a definir` e `escopo próprio/a definir` indicam **autorização pendente**, sem inventar papéis. Em UC001, sessões Django são uma implementação provisória; a decisão final sobre identidade e mecanismo ainda está aberta.
+- Nos quadros fora de UC001, `—` em entrada significa sem corpo JSON. `401` e `403` continuam respostas propostas conforme o mecanismo final; **SessionAuthentication responde `403` para acesso anônimo a `me` e `logout` nesta versão**, enquanto credenciais incorretas no login respondem `401`. Listas e envelopes JSON são apenas exemplos; paginação ainda não foi definida.
 
-## UC001 — autenticação
+## UC001 — autenticação HTTP provisória
 
-| Método e caminho propostos | Parâmetros e JSON de entrada ilustrativo | Resposta de sucesso ilustrativa | Acesso | Erros principais |
+| Método e caminho implementados | Entrada provisória | Resposta atual | Acesso | Erros atuais principais |
 |---|---|---|---|---|
-| `POST /api/v1/auth/login/` | Sem parâmetro de caminho; `{"identifier":"ana","password":"exemplo"}`. Identificador de login a definir. | `200 {"user":{"id":"u1"}}`; cookie de sessão ou token depende da decisão de autenticação. | Público | `400` entrada inválida; `401` credenciais inválidas. |
-| `POST /api/v1/auth/logout/` | Sem parâmetro; corpo `{}`. | `200 {"status":"signed_out"}`. Revogação/expiração depende do mecanismo escolhido. | Autenticado | `401`. |
-| `GET /api/v1/auth/me/` | Sem parâmetro; sem corpo. | `200 {"id":"u1"}`. Campos de perfil a definir. | Autenticado | `401`. |
+| `GET /api/v1/auth/csrf/` | Sem corpo. | `204` sem corpo; emite `Set-Cookie: csrftoken=...`, sem abrir sessão nem retornar dados de usuário. | Público, inclusive anônimo. | `405` para outro método com CSRF válido; um POST sem token pode receber `403` do middleware antes da checagem do método. |
+| `POST /api/v1/auth/login/` | JSON `{"identifier":"ana","password":"exemplo"}`; ambos os campos são provisórios. | `200 {"user":{"id":7}}` e cookie de sessão, se houver banco de usuários e sessões configurado. | Anônimo permitido; CSRF obrigatório mesmo sem sessão. | `400` JSON inválido; `401` credenciais inválidas ou usuário inativo; `403` CSRF; `405` método; `415` tipo de mídia. |
+| `POST /api/v1/auth/logout/` | JSON `{}` ou corpo vazio. | `200 {"status":"signed_out"}`; encerra a sessão Django. | Sessão autenticada e CSRF obrigatório. | `400` corpo não vazio; `403` sem autenticação ou CSRF; `405` método. |
+| `GET /api/v1/auth/me/` | Sem corpo. | `200 {"id":7}`; apenas a PK, sem dados pessoais. | Sessão autenticada. | `403` sem autenticação; `405` método. |
+
+`identifier` é encaminhado ao `USERNAME_FIELD` do modelo obtido por `get_user_model()` e ao backend configurado. Não há exigência de email. A adaptação ao modelo e ao backend definitivos está isolada na camada de autenticação e depende da decisão de identidade com a equipe de banco. Não foram criados modelos, tabelas ou migrations; a CI sem `DB_NAME` usa backend dummy. Os testes simulam usuários e chamadas de autenticação/sessão, mas **não homologam o fluxo real de login, persistência de sessão ou PostgreSQL**.
+
+**Fluxo do Front-end na mesma origem:** fazer `GET /api/v1/auth/csrf/` com cookies (`credentials: "same-origin"` no `fetch`), ler `csrftoken` de `document.cookie` e enviar esse valor no cabeçalho `X-CSRFToken` do `POST /api/v1/auth/login/`, junto de `Content-Type: application/json` e `credentials: "same-origin"`. Enviar o cookie de sessão nas chamadas a `GET /api/v1/auth/me/` e no `POST /api/v1/auth/logout/`; neste último, enviar também o cabeçalho CSRF e `{}` como corpo JSON. Django renova o token CSRF no login: reler `csrftoken` após a resposta antes de outro POST. `GET /api/v1/auth/csrf/` não autentica o visitante. O teste do login bem-sucedido e os testes de sessão usam mocks; persistência real depende do banco.
+
+**Origens distintas:** esquema, host ou porta diferentes já caracterizam outra origem; `localhost` e `127.0.0.1` também devem ser tratados separadamente. `CORS_ALLOWED_ORIGINS` permite apenas as origens listadas, mas a configuração atual não habilita credenciais CORS (`CORS_ALLOW_CREDENTIALS` é `False`). `CSRF_TRUSTED_ORIGINS` é uma lista separada para validar a origem de POSTs; incluí-la não habilita cookies CORS. Portanto, o fluxo de sessão de um Front-end em outra origem ainda não está configurado. Se essa topologia for aprovada, definir origens exatas, credenciais (`credentials: "include"` no cliente), domínio e política `SameSite` dos cookies, HTTPS e proxy confiável antes de ativá-la. Não usar curingas para liberar origens.
+
+**Ambientes:** `.env.example` usa `DJANGO_DEBUG=true` para desenvolvimento HTTP local; nessa condição, os cookies CSRF e de sessão não recebem `Secure`. Com `DEBUG=false`, ambos usam `Secure` e exigem HTTPS no navegador. Os padrões atuais `SameSite=Lax` e `CSRF_COOKIE_HTTPONLY=False` permitem a leitura do cookie CSRF pelo JavaScript na mesma origem; alterar essas opções exige revisar o fluxo. Em produção atrás de proxy TLS, a identificação segura do esquema pelo Django depende de configuração do proxy confiável. Nenhuma dessas configurações foi ampliada nesta etapa.
+
+Falhas de CSRF retornam `403 {"error":"CSRF inválido ou ausente."}` sem divulgar o motivo interno. Os erros de validação JSON usam respostas do DRF; os formatos definitivos de erro continuam pendentes de acordo com o Front-end.
 
 ## UC002 — usuários
 
@@ -83,8 +94,8 @@ A PR #2 usa intervalos `[início, fim)`: `10:00–11:00` e `11:00–12:00` não 
 | HTTP | Uso proposto | Exemplo JSON |
 |---|---|---|
 | `400 Bad Request` | Corpo, parâmetro ou intervalo inválido; data sem timezone; início não anterior ao fim. | `{"error":{"code":"INVALID_INTERVAL","message":"Início deve ser anterior ao fim."}}` |
-| `401 Unauthorized` | Falta autenticação ou credenciais de login inválidas. | `{"error":{"code":"UNAUTHENTICATED","message":"Autenticação necessária."}}` |
-| `403 Forbidden` | Identidade conhecida sem permissão para a operação. | `{"error":{"code":"FORBIDDEN","message":"Acesso não permitido."}}` |
+| `401 Unauthorized` | Credenciais de login inválidas em UC001; nas demais rotas, uso a decidir conforme autenticação final. | `{"error":{"code":"UNAUTHENTICATED","message":"Autenticação necessária."}}` (proposta para outras rotas) |
+| `403 Forbidden` | Nesta implementação de UC001, falta de sessão em `me`/`logout` ou falha de CSRF; nas demais rotas, também pode indicar falta de permissão. | `{"error":{"code":"FORBIDDEN","message":"Acesso não permitido."}}` (formato final proposto) |
 | `404 Not Found` | Recurso identificado no caminho não encontrado ou não visível, conforme política a decidir. | `{"error":{"code":"NOT_FOUND","message":"Recurso não encontrado."}}` |
 | `409 Conflict` | Estado atual impede operação (chave já emprestada, devolução duplicada, horário de reserva conflitante, identificação única duplicada). | Exemplos abaixo. |
 
@@ -113,4 +124,4 @@ As respostas de sucesso acima usam `200` quando incluem JSON e `201` quando prop
 - Definir quem cria/aplica migrations (inclusive as nativas Django), timezone e precisão dos timestamps, estratégia de testes e banco de teste.
 - Projetar constraints/índices e transações para impedir dois empréstimos ativos da mesma chave e reservas sobrepostas do mesmo espaço. A validação pura das PRs #2–#4 não protege gravações concorrentes.
 
-Nenhuma decisão deste documento cria tabela, migration, view, serializer ou endpoint.
+Além da camada HTTP provisória de UC001 descrita acima, as propostas restantes ainda não foram implementadas como tabela, migration, view, serializer ou endpoint.
