@@ -18,13 +18,13 @@ Regras principais: funções restritas exigem autenticação e permissões; sala
 
 Telas: login, dashboard, lista e detalhe de salas, agenda/disponibilidade, nova reserva, minhas reservas, administração. O texto menciona conflito de horário e cancelamento de reserva. **Esses pontos ainda precisam ser oficialmente incorporados aos requisitos escritos**.
 
-## Contrato de API sugerido — não implementado
+## Contrato de API sugerido — implementação parcial de UC001
 
 `/api/v1/` é a versão inicial. Recursos previstos:
 
 | Área | Exemplo de endpoint | Ação esperada |
 |---|---|---|
-| Autenticação | `POST /auth/login/` | Autenticar (mecanismo a decidir) |
+| Autenticação | `GET /auth/csrf/`, `POST /auth/login/`, `POST /auth/logout/`, `GET /auth/me/` | Camada HTTP provisória com sessões Django e cookie CSRF; identidade e integração com banco pendentes |
 | Usuários | `/users/` | Operações restritas por papel |
 | Salas | `/spaces/` | Listar e manter salas/laboratórios |
 | Chaves | `/keys/` | Manter e consultar disponibilidade |
@@ -32,7 +32,7 @@ Telas: login, dashboard, lista e detalhe de salas, agenda/disponibilidade, nova 
 | Reservas | `/bookings/` | Reservar, listar e cancelar |
 | Agenda | `/availability/` | Verificar horários sem conflitos |
 
-Endpoints, nomes e campos são **propostas**, não contratos aprovados. As operações de reserva devem validar conflitos em transação no banco, depois que o esquema for acordado.
+Fora de UC001, endpoints, nomes e campos são **propostas**, não contratos aprovados. Em UC001, `identifier`/`password`, sessões e respostas são provisórios e dependem de validação com o Front-end e com o responsável pelo banco. As operações de reserva devem validar conflitos em transação no banco, depois que o esquema for acordado.
 
 ## Alinhamento necessário com responsável pelo banco
 
