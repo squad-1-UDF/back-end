@@ -19,5 +19,7 @@ urlpatterns = [
     path("api/v1/auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("api/v1/auth/me/", MeView.as_view(), name="auth-me"),
     path("api/v1/spaces/", SpaceListCreateView.as_view(), name="spaces-list"),
-    path("api/v1/spaces/<str:space_id>/", SpaceDetailView.as_view(), name="spaces-detail"),
+    path(
+        "api/v1/spaces/<str:space_id>/", SpaceDetailView.as_view(), name="spaces-detail"
+    ),
 ]

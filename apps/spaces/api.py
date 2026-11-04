@@ -10,6 +10,7 @@ from apps.spaces.serializers import SpaceSerializer
 
 class SpaceListCreateView(APIView):
     permission_classes: ClassVar = [IsAuthenticated]
+
     def get(self, request):
         return Response(
             {"detail": "Listagem de salas ainda não implementada."},
@@ -19,7 +20,10 @@ class SpaceListCreateView(APIView):
     def post(self, request):
         serializer = SpaceSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST,)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response(
             {"detail": "Cadastro ainda não disponível."},
@@ -29,6 +33,7 @@ class SpaceListCreateView(APIView):
 
 class SpaceDetailView(APIView):
     permission_classes: ClassVar = [IsAuthenticated]
+
     def get(self, request, space_id):
         return Response(
             {"detail": "Consulta de espaço ainda não implementada."},
