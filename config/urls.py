@@ -2,6 +2,7 @@ from django.http import HttpResponseNotAllowed, JsonResponse
 from django.urls import path
 
 from apps.accounts.api import LoginView, LogoutView, MeView, csrf_cookie
+from apps.keys.api import KeyDetailView, KeyListCreateView
 
 
 def health(request):
@@ -17,4 +18,6 @@ urlpatterns = [
     path("api/v1/auth/login/", LoginView.as_view(), name="auth-login"),
     path("api/v1/auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("api/v1/auth/me/", MeView.as_view(), name="auth-me"),
+    path("api/v1/keys/", KeyListCreateView.as_view(), name="keys-list"),
+    path("api/v1/keys/<str:key_id>/", KeyDetailView.as_view(), name="keys-detail"),
 ]
