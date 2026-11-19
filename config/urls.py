@@ -2,6 +2,7 @@ from django.http import HttpResponseNotAllowed, JsonResponse
 from django.urls import path
 
 from apps.accounts.api import LoginView, LogoutView, MeView, csrf_cookie
+from apps.spaces.api import SpaceDetailView, SpaceListCreateView
 
 
 def health(request):
@@ -17,4 +18,8 @@ urlpatterns = [
     path("api/v1/auth/login/", LoginView.as_view(), name="auth-login"),
     path("api/v1/auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("api/v1/auth/me/", MeView.as_view(), name="auth-me"),
+    path("api/v1/spaces/", SpaceListCreateView.as_view(), name="spaces-list"),
+    path(
+        "api/v1/spaces/<str:space_id>/", SpaceDetailView.as_view(), name="spaces-detail"
+    ),
 ]
