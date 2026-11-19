@@ -14,6 +14,6 @@ O SQL gerado por `manage.py sqlmigrate spaces 0001` contém `CHECK (code::text ~
 
 - O serializer usa `code` (até 50 caracteres), `kind` (`room`/`laboratory`) e expõe `id` somente para leitura.
 - Listagem, cadastro, consulta e atualização parcial usam o ORM. A gravação ocorre em transação; a violação específica da unicidade de `code` retorna HTTP 409, inclusive se duas requisições concorrerem. Outras falhas do banco não são classificadas como duplicidade.
-- Todas as rotas exigem sessão autenticada. A política de permissões de gestão para POST/PATCH ainda precisa de aprovação; não existe distinção de papéis nesta etapa.
+- Todas as rotas exigem sessão autenticada. GET permite qualquer usuário autenticado; POST/PATCH exigem provisoriamente `is_staff=True` e CSRF. A aprovação institucional final da política de gestão permanece pendente, sem criar papéis novos nesta etapa.
 
 Sugestões para uma entrega futura, **sem implementação nesta migration**: nome de exibição, localização, capacidade e estado administrativo, caso sejam aprovados pelo grupo. As relações com chaves e reservas também dependem dos contratos dessas entidades.

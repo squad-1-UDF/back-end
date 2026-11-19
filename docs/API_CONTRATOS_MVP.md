@@ -120,7 +120,7 @@ As respostas de sucesso acima usam `200` quando incluem JSON e `201` quando prop
 
 - Confirmar se os fluxos de reservas/cancelamento já implementados entram no MVP escrito; dashboard pode compor consultas existentes ou exigir contrato próprio.
 - Definir login por sessão ou token, transporte de credencial, CSRF/CORS, logout e formato de perfil. Confirmar nomes de campos de entrada/saída, forma de listas e mensagens de erro.
-- Definir quais consultas são visíveis por usuário, quem pode gerir usuários/espaços/chaves, entregar/devolver e consultar histórico; não há perfis ou permissões definitivos neste documento.
+- Definir quais consultas são visíveis por usuário e confirmar institucionalmente quem pode gerir usuários, espaços e chaves, entregar/devolver e consultar histórico. Na UC003, POST/PATCH exigem provisoriamente `is_staff=True`; os perfis e a política final de permissões permanecem pendentes.
 - Confirmar diferença visual entre **chave sem empréstimo ativo** e **chave efetivamente disponível**, e entre essa informação e a **disponibilidade de horário de um espaço**.
 - Revisar com o Front-end a apresentação de timezone, validação de formulários e retorno de conflitos `409`. Decidir necessidade de paginação e do relatório UC009.
 

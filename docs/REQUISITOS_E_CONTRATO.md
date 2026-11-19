@@ -26,13 +26,13 @@ Telas: login, dashboard, lista e detalhe de salas, agenda/disponibilidade, nova 
 |---|---|---|
 | Autenticação | `GET /auth/csrf/`, `POST /auth/login/`, `POST /auth/logout/`, `GET /auth/me/` | Camada HTTP com sessões Django e cookie CSRF; `auth.User` nativo adotado provisoriamente, com PostgreSQL local e testes de integração separados |
 | Usuários | `/users/` | Operações restritas por papel |
-| Salas | `/spaces/` e `/spaces/{space_id}/` | Listar, cadastrar, consultar e atualizar parcialmente salas/laboratórios no PostgreSQL, com sessão autenticada |
+| Salas | `/spaces/` e `/spaces/{space_id}/` | Listar e consultar com sessão autenticada; cadastrar e atualizar parcialmente no PostgreSQL exigem provisoriamente `is_staff=True` e CSRF |
 | Chaves | `/keys/` | Manter e consultar disponibilidade |
 | Retiradas | `/key-loans/` | Entregar/devolver com registro auditável |
 | Reservas | `/bookings/` | Reservar, listar e cancelar |
 | Agenda | `/availability/` | Verificar horários sem conflitos |
 
-Fora de UC001 e UC003, endpoints, nomes e campos são **propostas**, não contratos aprovados. Em UC001, `identifier`/`password`, sessões e respostas são provisórios. Em UC003, `id` é inteiro, `code` é único e `kind` aceita `room` ou `laboratory`; a permissão administrativa de POST/PATCH ainda não foi definida. As operações de reserva devem validar conflitos em transação no banco, depois que o esquema for acordado.
+Fora de UC001 e UC003, endpoints, nomes e campos são **propostas**, não contratos aprovados. Em UC001, `identifier`/`password`, sessões e respostas são provisórios. Em UC003, `id` é inteiro, `code` é único e `kind` aceita `room` ou `laboratory`; POST/PATCH exigem provisoriamente `is_staff=True`, enquanto a aprovação institucional final dessa política permanece pendente. As operações de reserva devem validar conflitos em transação no banco, depois que o esquema for acordado.
 
 ## Alinhamento necessário com responsável pelo banco
 
