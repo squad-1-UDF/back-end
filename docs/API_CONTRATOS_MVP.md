@@ -1,6 +1,6 @@
 # Proposta de contratos HTTP do LabTech
 
-**Estado:** proposta para discussão. UC001 tem uma primeira camada HTTP com sessões Django e obtenção de cookie CSRF, ainda provisória e sem integração com banco de usuários. As demais rotas abaixo não estão implementadas. `GET /api/v1/health/` confirma apenas que o processo HTTP responde. Consulte [requisitos e contrato inicial](REQUISITOS_E_CONTRATO.md).
+**Estado:** proposta para discussão. UC001 tem camada HTTP com sessões Django e cookie CSRF. `auth.User` nativo foi adotado provisoriamente, com PostgreSQL local isolado e testes de integração separados. As demais rotas abaixo não estão implementadas. `GET /api/v1/health/` confirma apenas que o processo HTTP responde. Consulte [requisitos e contrato inicial](REQUISITOS_E_CONTRATO.md).
 
 ## Origem e nível de certeza
 
@@ -27,9 +27,9 @@
 | `POST /api/v1/auth/logout/` | JSON `{}` ou corpo vazio. | `200 {"status":"signed_out"}`; encerra a sessão Django. | Sessão autenticada e CSRF obrigatório. | `400` corpo não vazio; `403` sem autenticação ou CSRF; `405` método. |
 | `GET /api/v1/auth/me/` | Sem corpo. | `200 {"id":7}`; apenas a PK, sem dados pessoais. | Sessão autenticada. | `403` sem autenticação; `405` método. |
 
-`identifier` é encaminhado ao `USERNAME_FIELD` do modelo obtido por `get_user_model()` e ao backend configurado. Não há exigência de email. A adaptação ao modelo e ao backend definitivos está isolada na camada de autenticação e depende da decisão de identidade com a equipe de banco. Não foram criados modelos, tabelas ou migrations; a CI sem `DB_NAME` usa backend dummy. Os testes simulam usuários e chamadas de autenticação/sessão, mas **não homologam o fluxo real de login, persistência de sessão ou PostgreSQL**.
+`identifier` é encaminhado ao `USERNAME_FIELD` do modelo obtido por `get_user_model()` e ao backend configurado. Não há exigência de email. Por enquanto, usa-se `auth.User` nativo (`username`), sem modelo personalizado. Não foram criados modelos ou migrations de domínio; usam-se as migrations nativas de `auth`, `contenttypes` e `sessions`. A CI sem `DB_NAME` continua com backend dummy e testes simulados; o job PostgreSQL separado executa testes sem mocks de autenticação ou sessão. A identidade definitiva e as permissões de domínio continuam pendentes.
 
-**Fluxo do Front-end na mesma origem:** fazer `GET /api/v1/auth/csrf/` com cookies (`credentials: "same-origin"` no `fetch`), ler `csrftoken` de `document.cookie` e enviar esse valor no cabeçalho `X-CSRFToken` do `POST /api/v1/auth/login/`, junto de `Content-Type: application/json` e `credentials: "same-origin"`. Enviar o cookie de sessão nas chamadas a `GET /api/v1/auth/me/` e no `POST /api/v1/auth/logout/`; neste último, enviar também o cabeçalho CSRF e `{}` como corpo JSON. Django renova o token CSRF no login: reler `csrftoken` após a resposta antes de outro POST. `GET /api/v1/auth/csrf/` não autentica o visitante. O teste do login bem-sucedido e os testes de sessão usam mocks; persistência real depende do banco.
+**Fluxo do Front-end na mesma origem:** fazer `GET /api/v1/auth/csrf/` com cookies (`credentials: "same-origin"` no `fetch`), ler `csrftoken` de `document.cookie` e enviar esse valor no cabeçalho `X-CSRFToken` do `POST /api/v1/auth/login/`, junto de `Content-Type: application/json` e `credentials: "same-origin"`. Enviar o cookie de sessão nas chamadas a `GET /api/v1/auth/me/` e no `POST /api/v1/auth/logout/`; neste último, enviar também o cabeçalho CSRF e `{}` como corpo JSON. Django renova o token CSRF no login: reler `csrftoken` após a resposta antes de outro POST. `GET /api/v1/auth/csrf/` não autentica o visitante. Os testes HTTP antigos usam mocks; `apps/tests/test_auth_postgres.py` valida o fluxo e a persistência real em PostgreSQL isolado.
 
 **Origens distintas:** esquema, host ou porta diferentes já caracterizam outra origem; `localhost` e `127.0.0.1` também devem ser tratados separadamente. `CORS_ALLOWED_ORIGINS` permite apenas as origens listadas, mas a configuração atual não habilita credenciais CORS (`CORS_ALLOW_CREDENTIALS` é `False`). `CSRF_TRUSTED_ORIGINS` é uma lista separada para validar a origem de POSTs; incluí-la não habilita cookies CORS. Portanto, o fluxo de sessão de um Front-end em outra origem ainda não está configurado. Se essa topologia for aprovada, definir origens exatas, credenciais (`credentials: "include"` no cliente), domínio e política `SameSite` dos cookies, HTTPS e proxy confiável antes de ativá-la. Não usar curingas para liberar origens.
 
@@ -46,7 +46,7 @@ Falhas de CSRF retornam `403 {"error":"CSRF inválido ou ausente."}` sem divulga
 | `GET /api/v1/users/{user_id}/` | `user_id` no caminho; sem corpo. | `200 {"id":"u1","name":"Ana"}`. | Autenticado; escopo próprio/gestão a definir | `403`, `404`. |
 | `PATCH /api/v1/users/{user_id}/` | `user_id`; `{"name":"Ana Maria"}`. | `200 {"id":"u1","name":"Ana Maria"}`. | Autenticado; escopo próprio/gestão a definir | `400`, `403`, `404`, `409` se aplicável. |
 
-Exclusão, desativação, perfis, recuperação de senha, campos de login e uso de `auth_user` ou tabela própria estão pendentes. Não se propõe `DELETE` antes de decidir como preservar referências históricas. Os campos pessoais exemplificados só deverão ser retornados a quem tiver permissão e dentro do escopo aprovado.
+Exclusão, desativação, perfis, recuperação de senha e campos de login definitivos estão pendentes. `auth_user` é a escolha provisória de UC001; o vínculo com o responsável por uma chave ainda precisa de contrato. Não se propõe `DELETE` antes de decidir como preservar referências históricas. Os campos pessoais exemplificados só deverão ser retornados a quem tiver permissão e dentro do escopo aprovado.
 
 ## UC003 — salas e laboratórios
 
@@ -119,7 +119,7 @@ As respostas de sucesso acima usam `200` quando incluem JSON e `201` quando prop
 
 ### Responsável pelo PostgreSQL
 
-- Acordar tabelas/colunas, identificadores e relações de usuário, espaço, chave, empréstimo, movimentação e eventual reserva; decidir `auth_user` versus identidade própria antes de migrations de autenticação.
+- Acordar tabelas/colunas, identificadores e relações de usuário, espaço, chave, empréstimo, movimentação e eventual reserva; revisar a escolha provisória de `auth_user` antes das migrations de domínio.
 - Definir estados ativos/cancelados/encerrados, unicidade de sala, vínculo chave-espaço, retenção do histórico e política de exclusão/desativação.
 - Definir quem cria/aplica migrations (inclusive as nativas Django), timezone e precisão dos timestamps, estratégia de testes e banco de teste.
 - Projetar constraints/índices e transações para impedir dois empréstimos ativos da mesma chave e reservas sobrepostas do mesmo espaço. A validação pura das PRs #2–#4 não protege gravações concorrentes.
