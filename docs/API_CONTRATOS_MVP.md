@@ -1,6 +1,6 @@
 # Proposta de contratos HTTP do LabTech
 
-**Estado:** proposta para discussão. UC001 tem camada HTTP com sessões Django e cookie CSRF. `auth.User` nativo foi adotado provisoriamente, com PostgreSQL local isolado e testes de integração separados. As demais rotas abaixo não estão implementadas. `GET /api/v1/health/` confirma apenas que o processo HTTP responde. Consulte [requisitos e contrato inicial](REQUISITOS_E_CONTRATO.md).
+**Estado:** UC001 e as quatro rotas de UC003 têm implementação HTTP com sessões Django e PostgreSQL. `auth.User` nativo foi adotado provisoriamente. As demais rotas abaixo são propostas. `GET /api/v1/health/` confirma apenas que o processo HTTP responde. Consulte [requisitos e contrato inicial](REQUISITOS_E_CONTRATO.md).
 
 ## Origem e nível de certeza
 
@@ -9,14 +9,14 @@
 | Requisitos UC001–UC009 | Login; manutenção de usuários, salas/laboratórios e chaves; entrega e devolução de chave; consulta de disponibilidade e histórico de chave; emissão de histórico (UC009, P3). Funções restritas exigem autenticação e permissões. Salas têm identificação única; chaves pertencem a um espaço; entrega exige chave disponível e registra responsável e data/hora; devolução corresponde à entrega; o histórico é preservado. |
 | Proposta de MVP do grupo | Login, dashboard, salas, agenda, reservas, minhas reservas e administração. Conflito de horários e cancelamento de reserva **ainda não foram incorporados aos requisitos escritos**. |
 | Regras puras integradas à main | [PR #2](https://github.com/squad-1-UDF/back-end/pull/2): intervalos de reserva `[início, fim)`, sem conflito quando consecutivos; filtro por espaço e estado ativo fica com o chamador. [PR #3](https://github.com/squad-1-UDF/back-end/pull/3): retirada/devolução e histórico de eventos. [PR #4](https://github.com/squad-1-UDF/back-end/pull/4): empréstimo ativo e movimentações por chave; ausência de empréstimo ativo não garante disponibilidade física ou administrativa. Essas PRs não são endpoints nem schema aprovado. |
-| Este documento | UC001 descreve o comportamento HTTP implementado provisoriamente. Os demais métodos, caminhos, campos, respostas e erros são **propostas**, sujeitos à aprovação do Front-end, da equipe de banco e do grupo. |
+| Este documento | UC001 e UC003 descrevem o comportamento HTTP implementado nesta etapa. Os demais métodos, caminhos, campos, respostas e erros são **propostas**, sujeitos à aprovação do Front-end, da equipe de banco e do grupo. |
 
 ## Convenções propostas para leitura dos exemplos
 
-- Prefixo `/api/v1/`; identificadores como `u1`, `s1`, `k1`, `l1` e `b1` são referências **opacas ilustrativas**, sem escolha de PK, tabela ou tipo definitivo. Campos JSON exibidos servem para discutir o contrato; **não estabelecem campos obrigatórios finais**.
+- Prefixo `/api/v1/`. Em UC003, `space_id` e `id` são inteiros gerados pelo `BigAutoField`. Nas demais propostas, identificadores como `u1`, `k1`, `l1` e `b1` continuam referências ilustrativas, sem escolha de PK definitiva. Campos JSON fora de UC001 e UC003 servem para discutir o contrato.
 - Horários usam strings ISO 8601 com offset, por exemplo `2026-10-30T10:00:00-03:00`. O nome dos campos, a zona de apresentação, quem fornece o horário e a precisão serão acordados. As regras puras rejeitam datetimes sem timezone.
 - `Público` significa sem sessão/token. `Autenticado` é a proposta para leitura e operações de domínio; a configuração DRF atual exige autenticação por padrão, mas não define as permissões finais. `Gestão a definir` e `escopo próprio/a definir` indicam **autorização pendente**, sem inventar papéis. Em UC001, sessões Django são uma implementação provisória; a decisão final sobre identidade e mecanismo ainda está aberta.
-- Nos quadros fora de UC001, `—` em entrada significa sem corpo JSON. `401` e `403` continuam respostas propostas conforme o mecanismo final; **SessionAuthentication responde `403` para acesso anônimo a `me` e `logout` nesta versão**, enquanto credenciais incorretas no login respondem `401`. Listas e envelopes JSON são apenas exemplos; paginação ainda não foi definida.
+- Nos quadros, `—` em entrada significa sem corpo JSON. **SessionAuthentication responde `403` para acesso anônimo a `me`, `logout` e UC003 nesta versão**, enquanto credenciais incorretas no login respondem `401`. Fora de UC001 e UC003, listas e envelopes JSON são apenas exemplos; paginação ainda não foi definida.
 
 ## UC001 — autenticação HTTP provisória
 
@@ -48,16 +48,16 @@ Falhas de CSRF retornam `403 {"error":"CSRF inválido ou ausente."}` sem divulga
 
 Exclusão, desativação, perfis, recuperação de senha e campos de login definitivos estão pendentes. `auth_user` é a escolha provisória de UC001; o vínculo com o responsável por uma chave ainda precisa de contrato. Não se propõe `DELETE` antes de decidir como preservar referências históricas. Os campos pessoais exemplificados só deverão ser retornados a quem tiver permissão e dentro do escopo aprovado.
 
-## UC003 — salas e laboratórios
+## UC003 — salas e laboratórios implementados
 
-| Método e caminho propostos | Parâmetros e JSON de entrada ilustrativo | Resposta de sucesso ilustrativa | Acesso | Erros principais |
+| Método e caminho | Entrada | Resposta atual | Acesso | Erros atuais principais |
 |---|---|---|---|---|
-| `GET /api/v1/spaces/` | Sem corpo; filtros por tipo/capacidade a decidir. | `200 [{"id":"s1","code":"LAB-01","kind":"laboratory"}]`. | Autenticado | `403`. |
-| `POST /api/v1/spaces/` | `{"code":"LAB-01","kind":"laboratory"}`; nomes/valores a validar. | `201 {"id":"s1","code":"LAB-01","kind":"laboratory"}`. | Autenticado; gestão a definir | `400`, `403`, `409` para identificação duplicada. |
-| `GET /api/v1/spaces/{space_id}/` | `space_id`; sem corpo. | `200 {"id":"s1","code":"LAB-01","kind":"laboratory"}`. | Autenticado | `403`, `404`. |
-| `PATCH /api/v1/spaces/{space_id}/` | `space_id`; `{"code":"LAB-02"}`. | `200 {"id":"s1","code":"LAB-02","kind":"laboratory"}`. | Autenticado; gestão a definir | `400`, `403`, `404`, `409` para identificação duplicada. |
+| `GET /api/v1/spaces/` | Sem corpo; sem filtros. | `200 []` ou lista de `{ "id": 1, "code": "LAB-01", "kind": "laboratory" }`, ordenada por `id`. | Sessão autenticada | `403` anônimo. |
+| `POST /api/v1/spaces/` | JSON `{"code":"LAB-01","kind":"laboratory"}`. | `201 {"id":1,"code":"LAB-01","kind":"laboratory"}`. | Sessão autenticada e CSRF | `400` valores inválidos; `403` anônimo/CSRF; `409` código duplicado. |
+| `GET /api/v1/spaces/{space_id}/` | `space_id` inteiro; sem corpo. | `200 {"id":1,"code":"LAB-01","kind":"laboratory"}`. | Sessão autenticada | `403` anônimo; `404` inexistente. |
+| `PATCH /api/v1/spaces/{space_id}/` | `space_id` inteiro; JSON parcial como `{"code":"LAB-02"}`. | `200 {"id":1,"code":"LAB-02","kind":"laboratory"}`. | Sessão autenticada e CSRF | `400` valores inválidos; `403` anônimo/CSRF; `404` inexistente; `409` código duplicado. |
 
-`code` e `kind` ilustram a identificação única e a distinção sala/laboratório; não são colunas aprovadas. Exclusão/desativação de espaços com chaves ou reservas exige decisão de integridade referencial.
+`code` é obrigatório no cadastro, tem até 50 caracteres e não pode ser vazio ou só espaços; `kind` aceita `room` ou `laboratory`. O serializer remove espaços nas extremidades de `code` recebido por HTTP. A constraint de unicidade protege também gravações concorrentes; `409` retorna `{"code":["Já existe um espaço com este código."]}`. Escritas diretas no banco podem armazenar códigos com espaços nas extremidades e tratá-los como distintos. Exclusão/desativação e permissões administrativas para POST/PATCH ainda exigem decisão; por enquanto, qualquer sessão autenticada pode executar essas operações.
 
 ## UC004–UC009 — chaves, empréstimos, disponibilidade e histórico
 
@@ -124,4 +124,4 @@ As respostas de sucesso acima usam `200` quando incluem JSON e `201` quando prop
 - Definir quem cria/aplica migrations (inclusive as nativas Django), timezone e precisão dos timestamps, estratégia de testes e banco de teste.
 - Projetar constraints/índices e transações para impedir dois empréstimos ativos da mesma chave e reservas sobrepostas do mesmo espaço. A validação pura das PRs #2–#4 não protege gravações concorrentes.
 
-Além da camada HTTP de UC001 e do model/migration de `Space` para UC003, as propostas restantes ainda não foram integradas como persistência e endpoint. A camada HTTP provisória da PR #7 precisa ser ligada ao model após revisão conjunta.
+Além das camadas HTTP de UC001 e UC003 e do model/migration de `Space`, as propostas restantes ainda não foram integradas como persistência e endpoint.

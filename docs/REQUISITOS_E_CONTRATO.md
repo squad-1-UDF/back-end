@@ -18,7 +18,7 @@ Regras principais: funções restritas exigem autenticação e permissões; sala
 
 Telas: login, dashboard, lista e detalhe de salas, agenda/disponibilidade, nova reserva, minhas reservas, administração. O texto menciona conflito de horário e cancelamento de reserva. **Esses pontos ainda precisam ser oficialmente incorporados aos requisitos escritos**.
 
-## Contrato de API sugerido — implementação parcial de UC001
+## Contrato de API sugerido — implementação parcial de UC001 e UC003
 
 `/api/v1/` é a versão inicial. Recursos previstos:
 
@@ -26,13 +26,13 @@ Telas: login, dashboard, lista e detalhe de salas, agenda/disponibilidade, nova 
 |---|---|---|
 | Autenticação | `GET /auth/csrf/`, `POST /auth/login/`, `POST /auth/logout/`, `GET /auth/me/` | Camada HTTP com sessões Django e cookie CSRF; `auth.User` nativo adotado provisoriamente, com PostgreSQL local e testes de integração separados |
 | Usuários | `/users/` | Operações restritas por papel |
-| Salas | `/spaces/` | Listar e manter salas/laboratórios |
+| Salas | `/spaces/` e `/spaces/{space_id}/` | Listar, cadastrar, consultar e atualizar parcialmente salas/laboratórios no PostgreSQL, com sessão autenticada |
 | Chaves | `/keys/` | Manter e consultar disponibilidade |
 | Retiradas | `/key-loans/` | Entregar/devolver com registro auditável |
 | Reservas | `/bookings/` | Reservar, listar e cancelar |
 | Agenda | `/availability/` | Verificar horários sem conflitos |
 
-Fora de UC001, endpoints, nomes e campos são **propostas**, não contratos aprovados. Em UC001, `identifier`/`password`, sessões e respostas são provisórios e dependem de validação com o Front-end e com o responsável pelo banco. As operações de reserva devem validar conflitos em transação no banco, depois que o esquema for acordado.
+Fora de UC001 e UC003, endpoints, nomes e campos são **propostas**, não contratos aprovados. Em UC001, `identifier`/`password`, sessões e respostas são provisórios. Em UC003, `id` é inteiro, `code` é único e `kind` aceita `room` ou `laboratory`; a permissão administrativa de POST/PATCH ainda não foi definida. As operações de reserva devem validar conflitos em transação no banco, depois que o esquema for acordado.
 
 ## Alinhamento necessário com responsável pelo banco
 
@@ -43,4 +43,4 @@ Fora de UC001, endpoints, nomes e campos são **propostas**, não contratos apro
 - Convenções de timestamps e timezone.
 - Estratégia de ambientes (development/test) e criação de bancos de teste.
 
-O model mínimo `Space` de UC003 já foi criado com migration própria; sua integração HTTP com a PR #7 permanece pendente. Os demais models de negócio ainda dependem do contrato de dados.
+O model mínimo `Space` de UC003 e suas quatro rotas HTTP usam PostgreSQL. Os demais models de negócio ainda dependem do contrato de dados.

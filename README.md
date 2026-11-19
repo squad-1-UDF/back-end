@@ -1,6 +1,6 @@
 # Sistema de Gestão de Laboratórios e Salas — API
 
-API em Python 3.13, Django 5.2 e Django REST Framework. UC001 oferece `GET /api/v1/auth/csrf/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/logout/` e `GET /api/v1/auth/me/` com `auth.User` nativo e sessões Django. UC003 já tem o model `Space` e sua migration; a API de espaços permanece pendente de integração.
+API em Python 3.13, Django 5.2 e Django REST Framework. UC001 oferece `GET /api/v1/auth/csrf/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/logout/` e `GET /api/v1/auth/me/` com `auth.User` nativo e sessões Django. UC003 oferece listagem, cadastro, consulta e atualização parcial de salas e laboratórios persistidos no PostgreSQL.
 
 ## Preparar o ambiente local
 
@@ -41,7 +41,7 @@ API em Python 3.13, Django 5.2 e Django REST Framework. UC001 oferece `GET /api/
    python manage.py runserver
    ```
 
-   Acesse `http://127.0.0.1:8000/api/v1/health/`. O login e a sessão usam o PostgreSQL local. O model de espaços ainda não possui endpoints integrados nesta branch.
+   Acesse `http://127.0.0.1:8000/api/v1/health/`. O login, a sessão e os quatro endpoints em `/api/v1/spaces/` usam o PostgreSQL local. As rotas de espaços exigem sessão autenticada; POST e PATCH exigem `X-CSRFToken`. A política de permissões administrativas para escrita ainda precisa ser definida.
 
 ## Verificações
 
@@ -55,6 +55,7 @@ python manage.py check
 python -m pytest -q
 python -m pytest -q apps/tests/test_auth_postgres.py
 python -m pytest -q apps/tests/test_spaces_postgres.py
+python -m pytest -q apps/tests/test_spaces_api_postgres.py
 ```
 
 O pytest-django cria e remove `test_labtech_local`, separado de `labtech_local`, e aplica ali as migrations nativas e `spaces.0001_initial` para os testes integrados. Para executar somente os testes sem banco, faça `$env:DB_DISABLED = "true"; python -m pytest -q; Remove-Item Env:DB_DISABLED`; os testes PostgreSQL ficam ignorados nesse modo, mesmo com `.env` local. O servidor `runserver` não é um servidor de produção.
@@ -80,6 +81,6 @@ Em produção, `DJANGO_DEBUG=false` e as políticas de HTTPS, cookies, origem e 
 
 ## Próxima etapa
 
-UC001 usa provisoriamente `auth.User` nativo. O esquema mínimo de salas e laboratórios está em [docs/MODELO_SPACES.md](docs/MODELO_SPACES.md); a integração HTTP permanece com a PR #7. Ainda faltam os contratos de responsáveis, chaves, empréstimos, movimentações e reservas antes das demais migrations de domínio. O fluxo de cookies e `X-CSRFToken`, além das pendências de CORS para origens distintas, estão em [docs/API_CONTRATOS_MVP.md](docs/API_CONTRATOS_MVP.md). As APIs UC003/UC004 e `config/urls.py` não foram alterados nesta etapa.
+UC001 usa provisoriamente `auth.User` nativo. O esquema mínimo de salas e laboratórios está em [docs/MODELO_SPACES.md](docs/MODELO_SPACES.md). Ainda faltam as permissões administrativas para POST/PATCH e os contratos de responsáveis, chaves, empréstimos, movimentações e reservas antes das demais migrations de domínio. O fluxo de cookies e `X-CSRFToken`, além das pendências de CORS para origens distintas, estão em [docs/API_CONTRATOS_MVP.md](docs/API_CONTRATOS_MVP.md).
 
 Licença: [GNU GPL v3](LICENSE).
