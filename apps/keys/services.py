@@ -12,6 +12,12 @@ def movements_for_key(key):
 
 
 def _rule_history(key):
+    expected = {
+        loan_id: {"checkout", "return"} if returned_at is not None else {"checkout"}
+        for loan_id, returned_at in KeyLoan.objects.filter(key=key).values_list(
+            "id", "returned_at"
+        )
+    }
     history = []
     for movement in movements_for_key(key).select_related("loan"):
         loan = movement.loan
@@ -31,6 +37,9 @@ def _rule_history(key):
             ):
                 raise ValueError("Movimentação de devolução inconsistente.")
             history.append(KeyReturn(loan.pk, movement.occurred_at))
+        expected[loan.pk].discard(movement.kind)
+    if any(missing for missing in expected.values()):
+        raise ValueError("Empréstimo sem movimentação esperada no histórico.")
     return tuple(history)
 
 

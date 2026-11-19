@@ -2,6 +2,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
+from importlib import import_module
 from threading import Barrier
 
 import pytest
@@ -13,6 +14,7 @@ from django.db.models.deletion import ProtectedError
 
 from apps.keys.models import Key, KeyLoan, KeyMovement
 from apps.keys.services import (
+    _rule_history,
     checkout_key,
     has_active_loan,
     movements_for_key,
@@ -162,16 +164,15 @@ def test_services_reject_inconsistent_existing_movements(domain):
     loan = checkout_key(
         key_id=key.pk, responsible=responsible, operator=operator, occurred_at=AT
     )
-    checkout = KeyMovement.objects.get(loan=loan, kind="checkout")
-    KeyMovement.objects.filter(pk=checkout.pk).update(operator=responsible)
+    KeyLoan.objects.filter(pk=loan.pk).update(checkout_operator=responsible)
     with pytest.raises(ValueError, match="inconsistente"):
         return_key(
             loan_id=loan.pk, operator=operator, occurred_at=AT + timedelta(hours=1)
         )
     assert KeyLoan.objects.get(pk=loan.pk).returned_at is None
-    KeyMovement.objects.filter(pk=checkout.pk).update(operator=operator)
+    KeyLoan.objects.filter(pk=loan.pk).update(checkout_operator=operator)
     return_key(loan_id=loan.pk, operator=operator, occurred_at=AT + timedelta(hours=1))
-    KeyMovement.objects.filter(loan=loan, kind="return").update(occurred_at=AT)
+    KeyLoan.objects.filter(pk=loan.pk).update(returned_at=AT)
     with pytest.raises(ValueError, match="inconsistente"):
         checkout_key(
             key_id=key.pk,
@@ -180,6 +181,103 @@ def test_services_reject_inconsistent_existing_movements(domain):
             occurred_at=AT + timedelta(hours=2),
         )
     assert KeyLoan.objects.count() == 1
+
+
+@pytest.mark.parametrize("kind", ["checkout", "return"])
+@pytest.mark.parametrize("action", ["update", "delete"])
+def test_postgresql_rejects_direct_movement_changes(domain, kind, action):
+    key, responsible, operator = domain
+    loan = checkout_key(
+        key_id=key.pk, responsible=responsible, operator=operator, occurred_at=AT
+    )
+    return_key(loan_id=loan.pk, operator=operator, occurred_at=AT + timedelta(hours=1))
+    movement = KeyMovement.objects.get(loan=loan, kind=kind)
+    original = (movement.occurred_at, movement.operator_id)
+
+    with (
+        pytest.raises(IntegrityError),
+        transaction.atomic(),
+        connection.cursor() as cursor,
+    ):
+        if action == "update":
+            cursor.execute(
+                "UPDATE keys_keymovement SET occurred_at = %s WHERE id = %s",
+                [AT + timedelta(days=1), movement.pk],
+            )
+        else:
+            cursor.execute("DELETE FROM keys_keymovement WHERE id = %s", [movement.pk])
+
+    movement.refresh_from_db()
+    assert (movement.occurred_at, movement.operator_id) == original
+    assert list(movements_for_key(key).values_list("kind", flat=True)) == [
+        "checkout",
+        "return",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("returned", "movement_kinds"),
+    [
+        (False, ()),
+        (True, ()),
+        (True, ("checkout",)),
+        (True, ("return",)),
+    ],
+)
+def test_history_rejects_loans_without_expected_movements(
+    domain, returned, movement_kinds
+):
+    key, responsible, operator = domain
+    loan = KeyLoan.objects.create(
+        key=key,
+        responsible=responsible,
+        checkout_operator=operator,
+        checked_out_at=AT,
+        returned_at=AT + timedelta(hours=1) if returned else None,
+        return_operator=operator if returned else None,
+    )
+    for kind in movement_kinds:
+        KeyMovement.objects.create(
+            loan=loan,
+            kind=kind,
+            occurred_at=AT if kind == "checkout" else AT + timedelta(hours=1),
+            operator=operator,
+        )
+
+    with pytest.raises(ValueError, match="sem movimentação esperada"):
+        _rule_history(key)
+    with pytest.raises(ValueError, match="sem movimentação esperada"):
+        checkout_key(
+            key_id=key.pk,
+            responsible=responsible,
+            operator=operator,
+            occurred_at=AT + timedelta(hours=2),
+        )
+    assert KeyLoan.objects.count() == 1
+
+
+@pytest.mark.django_db(transaction=True)
+def test_movement_trigger_has_reversible_sql():
+    migration = import_module("apps.keys.migrations.0001_initial").Migration
+    operation = migration.operations[-1]
+
+    def trigger_exists():
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = %s)",
+                ["keys_movement_immutable"],
+            )
+            return cursor.fetchone()[0]
+
+    assert trigger_exists()
+    with connection.schema_editor() as editor:
+        operation.database_backwards("keys", editor, None, None)
+    try:
+        assert not trigger_exists()
+    finally:
+        with connection.schema_editor() as editor:
+            operation.database_forwards("keys", editor, None, None)
+    assert trigger_exists()
 
 
 def test_key_cannot_move_after_history(domain):

@@ -169,4 +169,23 @@ class Migration(migrations.Migration):
                 DROP FUNCTION keys_reject_space_change_after_loan();
             """,
         ),
+        migrations.RunSQL(
+            sql="""
+                CREATE FUNCTION keys_reject_movement_change() RETURNS trigger
+                LANGUAGE plpgsql AS $$
+                BEGIN
+                    RAISE EXCEPTION 'Existing key movements cannot be changed'
+                        USING ERRCODE = '23514',
+                              CONSTRAINT = 'keys_movement_immutable';
+                END;
+                $$;
+                CREATE TRIGGER keys_movement_immutable
+                BEFORE UPDATE OR DELETE ON keys_keymovement
+                FOR EACH ROW EXECUTE FUNCTION keys_reject_movement_change();
+            """,
+            reverse_sql="""
+                DROP TRIGGER keys_movement_immutable ON keys_keymovement;
+                DROP FUNCTION keys_reject_movement_change();
+            """,
+        ),
     ]
