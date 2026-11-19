@@ -75,25 +75,32 @@ Exclusão, desativação, perfis, recuperação de senha e campos de login defin
 
 `loan-availability` expõe **somente ausência/presença de empréstimo ativo**. Não afirma que a chave existe fisicamente, está liberada administrativamente ou pode ser entregue. A retirada revalida o histórico na transação; um `GET` anterior não reserva a chave. A devolução preserva a retirada e registra evento vinculado ao empréstimo. O histórico é ordenado por horário e ID, contém apenas tipo, empréstimo e horário e não oferece alteração ou exclusão. Os erros HTTP de UC005–UC008 usam `error.code` e `error.message`; erros `400` também incluem `error.details`. Falhas de CSRF mantêm a resposta de UC001: `403 {"error":"CSRF inválido ou ausente."}`. Identificadores, autorização e formato de resposta das outras rotas continuam sujeitos à integração com o Front-end.
 
-## Reservas e disponibilidade de espaços — proposta adicional de MVP
+## Reservas e disponibilidade de espaços — implementação provisória do MVP
 
-Estas rotas são **propostas da tela/agenda do MVP**, não casos UC001–UC009 aprovados. Não se misturam com disponibilidade de chaves.
+Estas rotas atendem à proposta de reservas do MVP; não fazem parte dos casos UC001–UC009 aprovados. Usam `auth.User`, autenticação por sessão e IDs inteiros. `POST` exige CSRF. As datas de entrada são ISO 8601 com offset explícito; as respostas seguem o timezone configurado no Django.
 
-| Método e caminho propostos | Parâmetros e JSON de entrada ilustrativo | Resposta de sucesso ilustrativa | Acesso | Erros principais |
-|---|---|---|---|---|
-| `GET /api/v1/spaces/{space_id}/booking-availability/` | `space_id`; query `start_at=2026-10-30T10:00:00-03:00&end_at=2026-10-30T11:00:00-03:00`; sem corpo. | `200 {"space_id":"s1","start_at":"2026-10-30T10:00:00-03:00","end_at":"2026-10-30T11:00:00-03:00","available":false}`. | Autenticado | `400` intervalo inválido/sem timezone; `403`, `404`. |
-| `GET /api/v1/bookings/` | Sem corpo; filtros `space_id`, período e `mine` a decidir. | `200 [{"id":"b1","space_id":"s1","start_at":"2026-10-30T10:00:00-03:00","end_at":"2026-10-30T11:00:00-03:00"}]`. | Autenticado; alcance da lista a definir | `400`, `403`. |
-| `POST /api/v1/bookings/` | `{"space_id":"s1","start_at":"2026-10-30T10:00:00-03:00","end_at":"2026-10-30T11:00:00-03:00"}`. | `201 {"id":"b1","space_id":"s1","start_at":"2026-10-30T10:00:00-03:00","end_at":"2026-10-30T11:00:00-03:00"}`. | Autenticado; permissão de reserva a definir | `400` intervalo inválido/sem timezone; `403`, `404`, `409 BOOKING_CONFLICT`. |
-| `GET /api/v1/bookings/{booking_id}/` | `booking_id`; sem corpo. | `200 {"id":"b1","space_id":"s1","start_at":"2026-10-30T10:00:00-03:00","end_at":"2026-10-30T11:00:00-03:00"}`. | Autenticado; escopo próprio/gestão a definir | `403`, `404`. |
-| `POST /api/v1/bookings/{booking_id}/cancel/` | `booking_id`; corpo `{}`. | `200 {"id":"b1","status":"cancelled"}`. | Autenticado; titular/gestão a definir | `403`, `404`, `409` cancelamento incompatível, se aprovado. |
+| Método e caminho | Entrada | Resposta de sucesso | Acesso |
+|---|---|---|---|
+| `POST /api/v1/bookings/` | JSON com `space_id` inteiro, `start_at` e `end_at` | `201` com `id`, `space_id`, `start_at`, `end_at`, `status: "active"`, `created_at` e `cancelled_at: null` | Usuário autenticado; responsável é sempre a sessão |
+| `GET /api/v1/bookings/` | Filtros opcionais `space_id`, `status=active\|cancelled`, `scope=mine\|all`, `limit` e `offset` | `200` com lista dos mesmos campos, ordenada por início e ID | Por padrão somente próprias; `scope=all` exige staff |
+| `GET /api/v1/bookings/{booking_id}/` | ID inteiro | `200` com os campos da reserva | Titular ou staff; terceiros recebem `404` |
+| `POST /api/v1/bookings/{booking_id}/cancel/` | JSON `{}` | `200` com `id`, `status: "cancelled"` e `cancelled_at` | Titular ou staff; terceiros recebem `404` |
+| `GET /api/v1/spaces/{space_id}/booking-availability/` | Query `start_at` e `end_at` | `200` com `space_id`, intervalo e `available` | Autenticado |
+| `GET /api/v1/spaces/{space_id}/booking-agenda/` | Query `start_at` e `end_at` | `200` com `space_id`, intervalo e `occupied: [{"start_at": "...", "end_at": "..."}]` | Autenticado |
 
-A PR #2 usa intervalos `[início, fim)`: `10:00–11:00` e `11:00–12:00` não conflitam. A verificação considera somente reservas ativas do **mesmo espaço**. O contrato de estados, cancelamento e conflitos ainda depende de aprovação. A criação de reserva precisa validar e gravar sob proteção transacional/constraint no banco; o `GET` de disponibilidade é apenas consulta instantânea. Não se propõem duração máxima, expediente ou recorrência.
+Reservas usam intervalos `[início, fim)`: horários consecutivos não conflitam. A constraint PostgreSQL impede sobreposição de reservas **ativas no mesmo espaço**, inclusive gravações concorrentes ou diretas. Cancelar preserva o registro e libera seu intervalo para nova reserva. Disponibilidade e agenda consultam apenas reservas ativas; não expõem usuário e representam uma fotografia do momento, sem garantir uma reserva futura. O banco não impõe duração máxima, expediente ou recorrência.
+
+A listagem retorna no máximo 100 reservas por chamada (`limit` padrão 100, máximo 100; `offset` padrão 0). As consultas de disponibilidade e agenda exigem intervalo de até 31 dias. Se houver mais de 1.000 horários ocupados na janela, a agenda retorna `400 INVALID_REQUEST` para que o cliente consulte uma janela menor; ela nunca devolve uma lista truncada como se estivesse completa. Esses limites são do contrato de consulta e não limitam a duração de uma reserva.
+
+Na implantação, a migration instala `btree_gist` antes de criar a constraint. No PostgreSQL 16, essa extensão é confiável e o papel que aplica a migration precisa de privilégio `CREATE` no banco para instalá-la; a criação da tabela também requer privilégio de criação no schema de destino. Se a política do ambiente não permitir esse privilégio, um administrador deve instalar `btree_gist` previamente **no mesmo banco** antes da migration. Consulte a [documentação PostgreSQL](https://www.postgresql.org/docs/16/btree-gist.html) e a [operação do Django](https://docs.djangoproject.com/en/5.2/ref/contrib/postgres/operations/).
+
+Erros de entrada usam `400 INVALID_REQUEST`, falta de sessão ou permissão usa `403 FORBIDDEN`, espaço/reserva ausente ou reserva alheia usa `404 NOT_FOUND`, sobreposição usa `409 BOOKING_CONFLICT` e cancelamento repetido usa `409 BOOKING_ALREADY_CANCELLED`. O envelope comum é `{"error":{"code":"...","message":"..."}}`; erros `400` incluem `details`. Falha de CSRF segue o corpo já adotado por UC001. Somente conflitos reconhecidos são convertidos em `409`.
 
 ## Formato de erro e status propostos
 
 | HTTP | Uso proposto | Exemplo JSON |
 |---|---|---|
-| `400 Bad Request` | Corpo ou parâmetro inválido. UC005–UC006 usam `INVALID_REQUEST` e `details`; intervalos de reserva ainda são proposta. | `{"error":{"code":"INVALID_REQUEST","message":"Entrada inválida.","details":{"key_id":["Informe um inteiro."]}}}` |
+| `400 Bad Request` | Corpo ou parâmetro inválido. UC005–UC006 e reservas usam `INVALID_REQUEST` e `details`. | `{"error":{"code":"INVALID_REQUEST","message":"Entrada inválida.","details":{"key_id":["Informe um inteiro."]}}}` |
 | `401 Unauthorized` | Credenciais de login inválidas em UC001; UC005–UC008 usam `403` sem sessão. | `{"error":{"code":"UNAUTHENTICATED","message":"Autenticação necessária."}}` (proposta para outras rotas) |
 | `403 Forbidden` | Falta de sessão ou de permissão staff em UC005–UC008; falhas de CSRF têm o corpo já usado por UC001. | `{"error":{"code":"FORBIDDEN","message":"Acesso não permitido."}}` |
 | `404 Not Found` | Recurso identificado no caminho não encontrado ou não visível, conforme política a decidir. | `{"error":{"code":"NOT_FOUND","message":"Recurso não encontrado."}}` |
@@ -101,27 +108,27 @@ A PR #2 usa intervalos `[início, fim)`: `10:00–11:00` e `11:00–12:00` não 
 
 **Chave indisponível por empréstimo ativo:** `409 {"error":{"code":"KEY_UNAVAILABLE","message":"Chave com empréstimo ativo.","details":{"key_id":1}}}`. Outras restrições de disponibilidade não são verificadas por UC005–UC008.
 
-**Horários sobrepostos:** `409 {"error":{"code":"BOOKING_CONFLICT","message":"Horário indisponível para o espaço.","details":{"space_id":"s1"}}}`. Exposição de reservas conflitantes e dados de terceiros depende de permissão/privacidade. Intervalos adjacentes não geram esse erro.
+**Horários sobrepostos:** `409 {"error":{"code":"BOOKING_CONFLICT","message":"Horário indisponível para o espaço.","details":{"space_id":1}}}`. A resposta não expõe reservas conflitantes nem dados pessoais. Intervalos adjacentes não geram esse erro.
 
 **Devolução repetida:** `409 {"error":{"code":"LOAN_ALREADY_RETURNED","message":"Empréstimo já encerrado."}}`. Os nomes de códigos, mensagens, envelope e a distinção final entre `400`, `404` e `409` precisam ser fechados com o Front-end. Erros internos não devem revelar segredos ou dados de terceiros.
 
 As respostas de sucesso acima usam `200` quando incluem JSON e `201` quando propõem a criação de recurso. **`204 No Content` não foi proposto** porque os exemplos de logout, devolução e cancelamento retornam JSON; pode ser considerado se a equipe optar por respostas vazias. **`422 Unprocessable Content` não foi proposto**: erros de entrada usam `400` e conflitos com o estado atual usam `409` nesta proposta, evitando duas convenções de validação antes do acordo. A forma final de distinguir `401` e `403` também deve acompanhar o mecanismo de autenticação escolhido.
 
-## Alinhamento antes de implementar
+## Pendências de alinhamento
 
 ### Front-end e produto
 
-- Confirmar quais telas e fluxos de reservas/cancelamento entram no MVP escrito; dashboard pode compor consultas existentes ou exigir contrato próprio.
+- Confirmar se os fluxos de reservas/cancelamento já implementados entram no MVP escrito; dashboard pode compor consultas existentes ou exigir contrato próprio.
 - Definir login por sessão ou token, transporte de credencial, CSRF/CORS, logout e formato de perfil. Confirmar nomes de campos de entrada/saída, forma de listas e mensagens de erro.
 - Definir quais consultas são visíveis por usuário, quem pode gerir usuários/espaços/chaves, entregar/devolver e consultar histórico; não há perfis ou permissões definitivos neste documento.
 - Confirmar diferença visual entre **chave sem empréstimo ativo** e **chave efetivamente disponível**, e entre essa informação e a **disponibilidade de horário de um espaço**.
-- Definir apresentação de timezone, validação de formulários, retorno de conflitos `409` e tratamento de reservas consecutivas. Decidir necessidade de filtros, paginação, cancelamento e relatório UC009.
+- Revisar com o Front-end a apresentação de timezone, validação de formulários e retorno de conflitos `409`. Decidir necessidade de paginação e do relatório UC009.
 
 ### Responsável pelo PostgreSQL
 
-- Acordar tabelas/colunas, identificadores e relações de usuário, espaço, chave, empréstimo, movimentação e eventual reserva; revisar a escolha provisória de `auth_user` antes das migrations de domínio.
+- Revisar as tabelas e relações de usuário, espaço, chave, empréstimo, movimentação e reserva; `auth_user` segue como escolha provisória.
 - Definir estados ativos/cancelados/encerrados, unicidade de sala, vínculo chave-espaço, retenção do histórico e política de exclusão/desativação.
 - Definir quem cria/aplica migrations (inclusive as nativas Django), timezone e precisão dos timestamps, estratégia de testes e banco de teste.
-- Projetar constraints/índices e transações para impedir dois empréstimos ativos da mesma chave e reservas sobrepostas do mesmo espaço. A validação pura das PRs #2–#4 não protege gravações concorrentes.
+- Revisar a operação das constraints e transações já implementadas para empréstimos ativos e reservas sobrepostas, especialmente antes da implantação compartilhada.
 
-UC005–UC008 usam a persistência de chaves já integrada à `main` e não implementam o CRUD da UC004. Reservas, relatório UC009 e as demais rotas propostas ainda dependem de contratos e integração. A camada HTTP provisória da PR #7 precisa ser ligada ao model após revisão conjunta.
+UC005–UC008 usam a persistência de chaves já integrada à `main` e não implementam o CRUD da UC004. Reservas e agenda agora têm implementação provisória nesta branch; sua autorização e seu contrato ainda precisam de revisão conjunta. O relatório UC009 e as demais rotas propostas seguem pendentes.
