@@ -34,15 +34,19 @@ def post_json(client, url, payload, *, csrf=None):
     return client.post(url, data=payload, content_type="application/json", **headers)
 
 
-def test_uc001_real_login_session_and_logout():
+@pytest.mark.parametrize("is_staff", [False, True])
+def test_uc001_real_login_session_and_logout(is_staff):
     user_model = get_user_model()
     assert user_model._meta.label == "auth.User"
-    user = user_model.objects.create_user(username="ana", password="senha-forte-123")
+    user = user_model.objects.create_user(
+        username="ana", password="senha-forte-123", is_staff=is_staff
+    )
     assert user.password != "senha-forte-123"
     assert user.check_password("senha-forte-123")
 
     client = Client(enforce_csrf_checks=True)
     login_url = reverse("auth-login")
+    assert client.get(reverse("auth-me")).status_code == 403
     csrf_response = client.get(reverse("auth-csrf"))
     assert csrf_response.status_code == 204
     assert "csrftoken" in client.cookies
@@ -72,7 +76,7 @@ def test_uc001_real_login_session_and_logout():
     later_client.cookies["sessionid"] = session_key
     me = later_client.get(reverse("auth-me"))
     assert me.status_code == 200
-    assert me.json() == {"id": user.pk}
+    assert me.json() == {"id": user.pk, "is_staff": is_staff}
 
     # O login renova o token CSRF; use o cookie atual para o logout.
     logout = post_json(

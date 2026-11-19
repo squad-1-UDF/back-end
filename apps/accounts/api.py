@@ -101,4 +101,4 @@ class MeView(APIView):
     http_method_names = ("get", "options")
 
     def get(self, request):
-        return Response({"id": request.user.pk})
+        return Response({"id": request.user.pk, "is_staff": request.user.is_staff})

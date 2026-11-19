@@ -11,8 +11,10 @@ from apps.accounts.api import authenticate_identifier
 BAD_CSRF_TOKEN = "b" * 32
 
 
-def fake_user(*, active=True):
-    return SimpleNamespace(pk=7, is_active=active, is_authenticated=True)
+def fake_user(*, active=True, staff=False):
+    return SimpleNamespace(
+        pk=7, is_active=active, is_authenticated=True, is_staff=staff
+    )
 
 
 class AuthApiTests(SimpleTestCase):
@@ -178,13 +180,16 @@ class AuthApiTests(SimpleTestCase):
         self.assertEqual(me.status_code, 403)
         self.assertEqual(logout_response.status_code, 403)
 
-    def test_me_returns_only_id_for_authenticated_request(self):
-        with patch(
-            "django.contrib.auth.middleware.auth.get_user", return_value=fake_user()
-        ):
-            response = self.client.get(self.me_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"id": 7})
+    def test_me_returns_id_and_staff_permission_for_authenticated_request(self):
+        for staff in (False, True):
+            with self.subTest(staff=staff):
+                with patch(
+                    "django.contrib.auth.middleware.auth.get_user",
+                    return_value=fake_user(staff=staff),
+                ):
+                    response = self.client.get(self.me_url)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json(), {"id": 7, "is_staff": staff})
 
     def test_logout_requires_csrf_for_authenticated_request(self):
         with (
