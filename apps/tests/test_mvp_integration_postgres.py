@@ -54,7 +54,10 @@ def login_client(user):
     assert response.json() == {"user": {"id": user.pk}}
     session = Session.objects.get(session_key=client.cookies["sessionid"].value)
     assert session.get_decoded()["_auth_user_id"] == str(user.pk)
-    assert client.get(reverse("auth-me")).json() == {"id": user.pk}
+    assert client.get(reverse("auth-me")).json() == {
+        "id": user.pk,
+        "is_staff": user.is_staff,
+    }
     return client
 
 
