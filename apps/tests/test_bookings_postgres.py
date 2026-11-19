@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db import IntegrityError, connection, transaction
+from django.db import IntegrityError, OperationalError, connection, transaction
 from django.db.models.deletion import ProtectedError
 from django.test import Client
 from django.urls import reverse
@@ -500,6 +500,31 @@ def test_concurrent_http_bookings_one_wins(domain):
 
 
 @pytest.mark.django_db(transaction=True)
+def test_concurrent_http_bookings_in_different_spaces_both_succeed(domain):
+    room, lab, owner, other, _ = domain
+    gate = Barrier(2, timeout=10)
+    url = reverse("bookings-list")
+
+    def attempt(user, space):
+        client = client_for(user)
+        try:
+            gate.wait()
+            return post_json(client, url, payload(space)).status_code
+        finally:
+            connection.close()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(
+            pool.map(lambda pair: attempt(*pair), [(owner, room), (other, lab)])
+        )
+
+    assert results == [201, 201]
+    assert Booking.objects.filter(status=Booking.Status.ACTIVE).count() == 2
+    assert Booking.objects.filter(space=room).count() == 1
+    assert Booking.objects.filter(space=lab).count() == 1
+
+
+@pytest.mark.django_db(transaction=True)
 def test_concurrent_cancellations_preserve_one_cancellation(domain):
     room, _, owner, _, staff = domain
     booking = create_booking(space=room, user=owner, start_at=START, end_at=END)
@@ -528,12 +553,13 @@ def test_concurrent_cancellations_preserve_one_cancellation(domain):
     assert Booking.objects.count() == 1
 
 
-def test_unexpected_integrity_error_is_not_conflict(domain, monkeypatch):
+@pytest.mark.parametrize("error_type", [IntegrityError, OperationalError])
+def test_unexpected_database_error_is_not_conflict(domain, monkeypatch, error_type):
     room, _, owner, _, _ = domain
     client = client_for(owner, raise_request_exception=False)
 
     def fail(*args, **kwargs):
-        raise IntegrityError("falha inesperada")
+        raise error_type("falha inesperada")
 
     monkeypatch.setattr(Booking.objects, "create", fail)
     response = post_json(client, reverse("bookings-list"), payload(room))
