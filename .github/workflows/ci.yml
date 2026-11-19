@@ -125,6 +125,7 @@ jobs:
           python -m pytest -q
           apps/tests/test_auth_postgres.py
           apps/tests/test_spaces_postgres.py
+          apps/tests/test_spaces_api_postgres.py
           apps/tests/test_keys_postgres.py
           apps/tests/test_key_loans_api_postgres.py
           apps/tests/test_bookings_postgres.py

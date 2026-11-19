@@ -1,6 +1,6 @@
 # Proposta de contratos HTTP do LabTech
 
-**Estado:** proposta para discussão, com UC001 e UC005–UC008 implementadas. Essas rotas usam sessões Django, cookie CSRF e `auth.User` nativo provisoriamente, com testes PostgreSQL isolados. As demais rotas abaixo continuam propostas. `GET /api/v1/health/` confirma apenas que o processo HTTP responde. Consulte [requisitos e contrato inicial](REQUISITOS_E_CONTRATO.md).
+**Estado:** proposta para discussão, com UC001, UC003, UC005–UC008 e reservas/agenda implementadas. Essas rotas usam sessões Django, cookie CSRF e `auth.User` nativo provisoriamente, com testes PostgreSQL isolados. As demais rotas abaixo continuam propostas. `GET /api/v1/health/` confirma apenas que o processo HTTP responde. Consulte [requisitos e contrato inicial](REQUISITOS_E_CONTRATO.md).
 
 ## Origem e nível de certeza
 
@@ -9,14 +9,14 @@
 | Requisitos UC001–UC009 | Login; manutenção de usuários, salas/laboratórios e chaves; entrega e devolução de chave; consulta de disponibilidade e histórico de chave; emissão de histórico (UC009, P3). Funções restritas exigem autenticação e permissões. Salas têm identificação única; chaves pertencem a um espaço; entrega exige chave disponível e registra responsável e data/hora; devolução corresponde à entrega; o histórico é preservado. |
 | Proposta de MVP do grupo | Login, dashboard, salas, agenda, reservas, minhas reservas e administração. Conflito de horários e cancelamento de reserva **ainda não foram incorporados aos requisitos escritos**. |
 | Regras puras integradas à main | [PR #2](https://github.com/squad-1-UDF/back-end/pull/2): intervalos de reserva `[início, fim)`, sem conflito quando consecutivos; filtro por espaço e estado ativo fica com o chamador. [PR #3](https://github.com/squad-1-UDF/back-end/pull/3): retirada/devolução e histórico de eventos. [PR #4](https://github.com/squad-1-UDF/back-end/pull/4): empréstimo ativo e movimentações por chave; ausência de empréstimo ativo não garante disponibilidade física ou administrativa. Essas PRs não são endpoints nem schema aprovado. |
-| Este documento | UC001 e UC005–UC008 descrevem comportamento HTTP implementado provisoriamente. Os demais métodos, caminhos, campos, respostas e erros são **propostas**, sujeitos à aprovação do Front-end, da equipe de banco e do grupo. |
+| Este documento | UC001, UC003, UC005–UC008 e reservas/agenda descrevem comportamento HTTP implementado provisoriamente. Os demais métodos, caminhos, campos, respostas e erros são **propostas**, sujeitos à aprovação do Front-end, da equipe de banco e do grupo. |
 
 ## Convenções propostas para leitura dos exemplos
 
-- Prefixo `/api/v1/`; nas rotas ainda propostas, identificadores como `u1`, `s1`, `k1`, `l1` e `b1` são referências **opacas ilustrativas**. UC005–UC008 usam as PKs inteiras de `Key`, `KeyLoan` e `auth.User`.
+- Prefixo `/api/v1/`; nas rotas ainda propostas, identificadores como `u1`, `s1`, `k1`, `l1` e `b1` são referências **opacas ilustrativas**. UC003, UC005–UC008 e reservas usam PKs inteiras.
 - Horários usam strings ISO 8601 com offset, por exemplo `2026-10-30T10:00:00-03:00`. Em UC005–UC006, o servidor define os horários; zona de apresentação e precisão das demais propostas ainda serão acordadas. As regras puras rejeitam datetimes sem timezone.
-- `Público` significa sem sessão/token. UC005–UC008 exigem sessão; as escritas UC005–UC006 exigem `is_staff` e CSRF. Nas outras propostas, `Autenticado`, `Gestão a definir` e `escopo próprio/a definir` ainda indicam autorização pendente. A identidade e o mecanismo finais continuam em discussão.
-- Nos quadros de propostas, `—` em entrada significa sem corpo JSON. **SessionAuthentication responde `403` para acesso anônimo a `me`, `logout` e UC005–UC008** nesta versão, enquanto credenciais incorretas no login respondem `401`. Paginação ainda não foi definida.
+- `Público` significa sem sessão/token. UC003 e UC005–UC008 exigem sessão; as escritas UC003 e UC005–UC006 exigem `is_staff` e CSRF. Nas outras propostas, `Autenticado`, `Gestão a definir` e `escopo próprio/a definir` ainda indicam autorização pendente. A identidade e o mecanismo finais continuam em discussão.
+- Nos quadros de propostas, `—` em entrada significa sem corpo JSON. **SessionAuthentication responde `403` para acesso anônimo a `me`, `logout`, UC003 e UC005–UC008** nesta versão, enquanto credenciais incorretas no login respondem `401`. Paginação ainda não foi definida.
 
 ## UC001 — autenticação HTTP provisória
 
@@ -27,7 +27,7 @@
 | `POST /api/v1/auth/logout/` | JSON `{}` ou corpo vazio. | `200 {"status":"signed_out"}`; encerra a sessão Django. | Sessão autenticada e CSRF obrigatório. | `400` corpo não vazio; `403` sem autenticação ou CSRF; `405` método. |
 | `GET /api/v1/auth/me/` | Sem corpo. | `200 {"id":7}`; apenas a PK, sem dados pessoais. | Sessão autenticada. | `403` sem autenticação; `405` método. |
 
-`identifier` é encaminhado ao `USERNAME_FIELD` do modelo obtido por `get_user_model()` e ao backend configurado. Não há exigência de email. Por enquanto, usa-se `auth.User` nativo (`username`), sem modelo personalizado. As migrations nativas de `auth`, `contenttypes` e `sessions`, `spaces.0001_initial` e `keys.0001_initial` cobrem a persistência atual. A CI sem banco continua com backend dummy; o job PostgreSQL executa os testes reais de autenticação, espaços, chaves e empréstimos. A identidade definitiva e as demais permissões de domínio continuam pendentes.
+`identifier` é encaminhado ao `USERNAME_FIELD` do modelo obtido por `get_user_model()` e ao backend configurado. Não há exigência de email. Por enquanto, usa-se `auth.User` nativo (`username`), sem modelo personalizado. As migrations nativas de `auth`, `contenttypes` e `sessions`, `spaces.0001_initial`, `keys.0001_initial` e `bookings.0001_initial` cobrem a persistência atual. A CI sem banco continua com backend dummy; o job PostgreSQL executa os testes reais de autenticação, espaços, chaves, empréstimos e reservas. A identidade definitiva e as demais permissões de domínio continuam pendentes.
 
 **Fluxo do Front-end na mesma origem:** fazer `GET /api/v1/auth/csrf/` com cookies (`credentials: "same-origin"` no `fetch`), ler `csrftoken` de `document.cookie` e enviar esse valor no cabeçalho `X-CSRFToken` do `POST /api/v1/auth/login/`, junto de `Content-Type: application/json` e `credentials: "same-origin"`. Enviar o cookie de sessão nas chamadas a `GET /api/v1/auth/me/` e no `POST /api/v1/auth/logout/`; neste último, enviar também o cabeçalho CSRF e `{}` como corpo JSON. Django renova o token CSRF no login: reler `csrftoken` após a resposta antes de outro POST. `GET /api/v1/auth/csrf/` não autentica o visitante. Os testes HTTP antigos usam mocks; `apps/tests/test_auth_postgres.py` valida o fluxo e a persistência real em PostgreSQL isolado.
 
@@ -48,16 +48,16 @@ Falhas de CSRF retornam `403 {"error":"CSRF inválido ou ausente."}` sem divulga
 
 Exclusão, desativação, perfis, recuperação de senha e campos de login definitivos estão pendentes. `auth_user` é a escolha provisória de UC001; o vínculo com o responsável por uma chave ainda precisa de contrato. Não se propõe `DELETE` antes de decidir como preservar referências históricas. Os campos pessoais exemplificados só deverão ser retornados a quem tiver permissão e dentro do escopo aprovado.
 
-## UC003 — salas e laboratórios
+## UC003 — salas e laboratórios implementados
 
-| Método e caminho propostos | Parâmetros e JSON de entrada ilustrativo | Resposta de sucesso ilustrativa | Acesso | Erros principais |
+| Método e caminho | Entrada | Resposta atual | Acesso | Erros atuais principais |
 |---|---|---|---|---|
-| `GET /api/v1/spaces/` | Sem corpo; filtros por tipo/capacidade a decidir. | `200 [{"id":"s1","code":"LAB-01","kind":"laboratory"}]`. | Autenticado | `403`. |
-| `POST /api/v1/spaces/` | `{"code":"LAB-01","kind":"laboratory"}`; nomes/valores a validar. | `201 {"id":"s1","code":"LAB-01","kind":"laboratory"}`. | Autenticado; gestão a definir | `400`, `403`, `409` para identificação duplicada. |
-| `GET /api/v1/spaces/{space_id}/` | `space_id`; sem corpo. | `200 {"id":"s1","code":"LAB-01","kind":"laboratory"}`. | Autenticado | `403`, `404`. |
-| `PATCH /api/v1/spaces/{space_id}/` | `space_id`; `{"code":"LAB-02"}`. | `200 {"id":"s1","code":"LAB-02","kind":"laboratory"}`. | Autenticado; gestão a definir | `400`, `403`, `404`, `409` para identificação duplicada. |
+| `GET /api/v1/spaces/` | Sem corpo; sem filtros. | `200 []` ou lista de `{ "id": 1, "code": "LAB-01", "kind": "laboratory" }`, ordenada por `id`. | Sessão autenticada | `403` anônimo. |
+| `POST /api/v1/spaces/` | JSON `{"code":"LAB-01","kind":"laboratory"}`. | `201 {"id":1,"code":"LAB-01","kind":"laboratory"}`. | Sessão staff e CSRF | `400` valores inválidos; `403` anônimo/não staff/CSRF; `409` código duplicado. |
+| `GET /api/v1/spaces/{space_id}/` | `space_id` inteiro; sem corpo. | `200 {"id":1,"code":"LAB-01","kind":"laboratory"}`. | Sessão autenticada | `403` anônimo; `404` inexistente. |
+| `PATCH /api/v1/spaces/{space_id}/` | `space_id` inteiro; JSON parcial como `{"code":"LAB-02"}`. | `200 {"id":1,"code":"LAB-02","kind":"laboratory"}`. | Sessão staff e CSRF | `400` valores inválidos; `403` anônimo/não staff/CSRF; `404` inexistente; `409` código duplicado. |
 
-`code` e `kind` ilustram a identificação única e a distinção sala/laboratório; não são colunas aprovadas. Exclusão/desativação de espaços com chaves ou reservas exige decisão de integridade referencial.
+`code` é obrigatório no cadastro, tem até 50 caracteres e não pode ser vazio ou só espaços; `kind` aceita `room` ou `laboratory`. O serializer remove espaços nas extremidades de `code` recebido por HTTP. A constraint de unicidade protege também gravações concorrentes; `409` retorna `{"error":{"code":"DUPLICATE_CODE","message":"Já existe um espaço com este código."}}`. Os erros `400`, `403` e `404` seguem o envelope `error.code` e `error.message` das APIs integradas; erros `400` incluem `error.details`. Falhas de CSRF mantêm o corpo de UC001. Escritas diretas no banco podem armazenar códigos com espaços nas extremidades e tratá-los como distintos. Exclusão/desativação ainda exige decisão.
 
 ## UC004–UC009 — chaves, empréstimos, disponibilidade e histórico
 
@@ -120,7 +120,7 @@ As respostas de sucesso acima usam `200` quando incluem JSON e `201` quando prop
 
 - Confirmar se os fluxos de reservas/cancelamento já implementados entram no MVP escrito; dashboard pode compor consultas existentes ou exigir contrato próprio.
 - Definir login por sessão ou token, transporte de credencial, CSRF/CORS, logout e formato de perfil. Confirmar nomes de campos de entrada/saída, forma de listas e mensagens de erro.
-- Definir quais consultas são visíveis por usuário, quem pode gerir usuários/espaços/chaves, entregar/devolver e consultar histórico; não há perfis ou permissões definitivos neste documento.
+- Definir quais consultas são visíveis por usuário e confirmar institucionalmente quem pode gerir usuários, espaços e chaves, entregar/devolver e consultar histórico. Na UC003, POST/PATCH exigem provisoriamente `is_staff=True`; os perfis e a política final de permissões permanecem pendentes.
 - Confirmar diferença visual entre **chave sem empréstimo ativo** e **chave efetivamente disponível**, e entre essa informação e a **disponibilidade de horário de um espaço**.
 - Revisar com o Front-end a apresentação de timezone, validação de formulários e retorno de conflitos `409`. Decidir necessidade de paginação e do relatório UC009.
 
@@ -131,4 +131,4 @@ As respostas de sucesso acima usam `200` quando incluem JSON e `201` quando prop
 - Definir quem cria/aplica migrations (inclusive as nativas Django), timezone e precisão dos timestamps, estratégia de testes e banco de teste.
 - Revisar a operação das constraints e transações já implementadas para empréstimos ativos e reservas sobrepostas, especialmente antes da implantação compartilhada.
 
-UC005–UC008 usam a persistência de chaves já integrada à `main` e não implementam o CRUD da UC004. Reservas e agenda agora têm implementação provisória nesta branch; sua autorização e seu contrato ainda precisam de revisão conjunta. O relatório UC009 e as demais rotas propostas seguem pendentes.
+UC003 usa a persistência de espaços; UC005–UC008 usam a persistência de chaves e não implementam o CRUD da UC004. Reservas e agenda também têm implementação provisória; sua autorização e seu contrato ainda precisam de revisão conjunta. O relatório UC009 e as demais rotas propostas seguem pendentes.

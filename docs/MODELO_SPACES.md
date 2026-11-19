@@ -8,12 +8,12 @@
 | `code` | `varchar(50) NOT NULL` | `UNIQUE`; pelo menos um caractere que não seja espaço em branco |
 | `kind` | `varchar(10) NOT NULL` | `CHECK` limitado a `room` e `laboratory` |
 
-O SQL gerado por `manage.py sqlmigrate spaces 0001` contém `CHECK (code::text ~ '[^[:space:]]')` e `CHECK (kind IN ('room', 'laboratory'))`. O índice único de `code` e o limite de 50 caracteres também são impostos pelo PostgreSQL. A unicidade é sensível a maiúsculas/minúsculas e considera o valor armazenado: uma gravação direta pode inserir `LAB-01` e ` LAB-01 ` como códigos distintos. O model e o banco não alteram códigos válidos com espaços nas pontas; o `SpaceSerializer` provisório da PR #7 já aplica `trim_whitespace=True` na entrada HTTP. Uma política de normalização para todos os escritores exige acordo separado.
+O SQL gerado por `manage.py sqlmigrate spaces 0001` contém `CHECK (code::text ~ '[^[:space:]]')` e `CHECK (kind IN ('room', 'laboratory'))`. O índice único de `code` e o limite de 50 caracteres também são impostos pelo PostgreSQL. A unicidade é sensível a maiúsculas/minúsculas e considera o valor armazenado: uma gravação direta pode inserir `LAB-01` e ` LAB-01 ` como códigos distintos. O model e o banco não alteram códigos válidos com espaços nas pontas; o `SpaceSerializer` aplica `trim_whitespace=True` na entrada HTTP. Uma política de normalização para todos os escritores exige acordo separado.
 
-## Integração pendente com a PR #7
+## Integração HTTP da UC003
 
-- O serializer já usa `code` (até 50 caracteres) e `kind` (`room`/`laboratory`), compatíveis com o model.
-- Ligar listagem, cadastro, consulta e atualização ao ORM na etapa de integração. Tratar violação de `code` único como conflito HTTP conforme o contrato; a pré-validação da API não substitui a constraint do banco.
-- Definir permissões de gestão e respostas definitivas com o responsável pela API. Esta branch não altera endpoints nem `config/urls.py`.
+- O serializer usa `code` (até 50 caracteres), `kind` (`room`/`laboratory`) e expõe `id` somente para leitura.
+- Listagem, cadastro, consulta e atualização parcial usam o ORM. A gravação ocorre em transação; a violação específica da unicidade de `code` retorna HTTP 409, inclusive se duas requisições concorrerem. Outras falhas do banco não são classificadas como duplicidade.
+- Todas as rotas exigem sessão autenticada. GET permite qualquer usuário autenticado; POST/PATCH exigem provisoriamente `is_staff=True` e CSRF. A aprovação institucional final da política de gestão permanece pendente, sem criar papéis novos nesta etapa.
 
 Sugestões para uma entrega futura, **sem implementação nesta migration**: nome de exibição, localização, capacidade e estado administrativo, caso sejam aprovados pelo grupo. As relações com chaves e reservas também dependem dos contratos dessas entidades.

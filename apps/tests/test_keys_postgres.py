@@ -26,6 +26,7 @@ database = settings.DATABASES["default"]
 if database["ENGINE"] == "django.db.backends.postgresql":
     allowed = {
         ("labtech_local", "127.0.0.1", "55432"),
+        ("labtech_local", "127.0.0.1", "56432"),
         ("labtech_ci", "127.0.0.1", "5432"),
     }
     target = (database["NAME"], database["HOST"], str(database["PORT"]))
