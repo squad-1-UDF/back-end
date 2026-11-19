@@ -1,5 +1,5 @@
 from django.http import HttpResponseNotAllowed, JsonResponse
-from django.urls import path
+from django.urls import include, path
 
 from apps.accounts.api import LoginView, LogoutView, MeView, csrf_cookie
 
@@ -17,4 +17,5 @@ urlpatterns = [
     path("api/v1/auth/login/", LoginView.as_view(), name="auth-login"),
     path("api/v1/auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("api/v1/auth/me/", MeView.as_view(), name="auth-me"),
+    path("api/v1/", include("apps.keys.loan_urls")),
 ]
