@@ -18,4 +18,5 @@ urlpatterns = [
     path("api/v1/auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("api/v1/auth/me/", MeView.as_view(), name="auth-me"),
     path("api/v1/", include("apps.keys.loan_urls")),
+    path("api/v1/", include("apps.bookings.urls")),
 ]
