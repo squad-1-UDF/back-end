@@ -1,5 +1,5 @@
 from django.http import HttpResponseNotAllowed, JsonResponse
-from django.urls import path
+from django.urls import include, path
 
 from apps.accounts.api import LoginView, LogoutView, MeView, csrf_cookie
 from apps.spaces.api import SpaceDetailView, SpaceListCreateView
@@ -22,4 +22,6 @@ urlpatterns = [
     path(
         "api/v1/spaces/<int:space_id>/", SpaceDetailView.as_view(), name="spaces-detail"
     ),
+    path("api/v1/", include("apps.keys.loan_urls")),
+    path("api/v1/", include("apps.bookings.urls")),
 ]

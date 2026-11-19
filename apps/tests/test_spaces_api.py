@@ -84,6 +84,7 @@ def test_post_rejeita_dados_invalidos(dados):
     usuario = SimpleNamespace(
         is_authenticated=True,
         is_active=True,
+        is_staff=True,
     )
     client.force_authenticate(user=usuario)
     response = client.post(

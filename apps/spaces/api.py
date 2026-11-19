@@ -3,9 +3,13 @@ from typing import ClassVar
 from django.db import IntegrityError, transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_protect
 from psycopg.errors import UniqueViolation
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.parsers import JSONParser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -22,7 +26,12 @@ def is_duplicate_code(error):
 
 def duplicate_code_response():
     return Response(
-        {"code": ["Já existe um espaço com este código."]},
+        {
+            "error": {
+                "code": "DUPLICATE_CODE",
+                "message": "Já existe um espaço com este código.",
+            }
+        },
         status=status.HTTP_409_CONFLICT,
     )
 
@@ -33,8 +42,38 @@ def get_space(space_id):
     return get_object_or_404(Space, pk=space_id)
 
 
-class SpaceListCreateView(APIView):
+class SpaceAPIView(APIView):
+    authentication_classes: ClassVar = (SessionAuthentication,)
     permission_classes: ClassVar = [IsAuthenticated]
+    parser_classes: ClassVar = (JSONParser,)
+
+    def get_permissions(self):
+        permissions = (
+            (IsAuthenticated, IsAdminUser)
+            if self.request.method in ("POST", "PATCH")
+            else (IsAuthenticated,)
+        )
+        return [permission() for permission in permissions]
+
+    def handle_exception(self, exc):
+        response = super().handle_exception(exc)
+        errors = {
+            400: ("INVALID_REQUEST", "Entrada inválida."),
+            403: ("FORBIDDEN", "Acesso não permitido."),
+            404: ("NOT_FOUND", "Recurso não encontrado."),
+        }
+        if response.status_code in errors:
+            code, message = errors[response.status_code]
+            error = {"code": code, "message": message}
+            if response.status_code == 400:
+                error["details"] = response.data
+            response.data = {"error": error}
+        return response
+
+
+@method_decorator(csrf_protect, name="dispatch")
+class SpaceListCreateView(SpaceAPIView):
+    http_method_names: ClassVar = ("get", "post", "options")
 
     def get(self, request):
         spaces = Space.objects.order_by("id")
@@ -56,8 +95,9 @@ class SpaceListCreateView(APIView):
         )
 
 
-class SpaceDetailView(APIView):
-    permission_classes: ClassVar = [IsAuthenticated]
+@method_decorator(csrf_protect, name="dispatch")
+class SpaceDetailView(SpaceAPIView):
+    http_method_names: ClassVar = ("get", "patch", "options")
 
     def get(self, request, space_id):
         space = get_space(space_id)

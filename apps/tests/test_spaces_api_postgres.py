@@ -19,6 +19,7 @@ database = settings.DATABASES["default"]
 if database["ENGINE"] == "django.db.backends.postgresql":
     allowed_targets = {
         ("labtech_local", "127.0.0.1", "55432"),
+        ("labtech_local", "127.0.0.1", "56432"),
         ("labtech_ci", "127.0.0.1", "5432"),
     }
     target = (database["NAME"], database["HOST"], str(database["PORT"]))
@@ -39,7 +40,7 @@ pytestmark = [
 @pytest.fixture
 def logged_in_client():
     user = get_user_model().objects.create_user(
-        username="gestor", password="senha-forte-123"
+        username="gestor", password="senha-forte-123", is_staff=True
     )
     client = Client(enforce_csrf_checks=True)
     assert client.get(reverse("auth-csrf")).status_code == 204
@@ -56,6 +57,23 @@ def logged_in_client():
     return client
 
 
+@pytest.fixture
+def regular_client():
+    user = get_user_model().objects.create_user(
+        username="comum", password="senha-forte-123"
+    )
+    client = Client(enforce_csrf_checks=True)
+    assert client.get(reverse("auth-csrf")).status_code == 204
+    login = client.post(
+        reverse("auth-login"),
+        data=json.dumps({"identifier": user.username, "password": "senha-forte-123"}),
+        content_type="application/json",
+        HTTP_X_CSRFTOKEN=client.cookies["csrftoken"].value,
+    )
+    assert login.status_code == 200
+    return client
+
+
 def request_json(client, method, url, payload, *, csrf=True):
     headers = {"HTTP_X_CSRFTOKEN": client.cookies["csrftoken"].value} if csrf else {}
     return getattr(client, method)(
@@ -66,22 +84,47 @@ def request_json(client, method, url, payload, *, csrf=True):
     )
 
 
-@pytest.mark.parametrize("method", ["get", "post", "patch"])
-def test_anonymous_requests_are_forbidden(method):
+@pytest.mark.parametrize(
+    "method,detail", [("get", False), ("get", True), ("post", False), ("patch", True)]
+)
+def test_anonymous_requests_are_forbidden(method, detail):
     client = Client(enforce_csrf_checks=True)
+    assert client.get(reverse("auth-csrf")).status_code == 204
     url = (
         reverse("spaces-list")
-        if method != "patch"
+        if not detail
         else reverse("spaces-detail", kwargs={"space_id": 1})
     )
     response = (
         client.get(url)
         if method == "get"
-        else request_json(
-            client, method, url, {"code": "LAB-01", "kind": "room"}, csrf=False
-        )
+        else request_json(client, method, url, {"code": "LAB-01", "kind": "room"})
     )
     assert response.status_code == 403
+    assert response.json()["error"]["code"] == "FORBIDDEN"
+
+
+def test_regular_user_can_read_but_cannot_write(regular_client):
+    space = Space.objects.create(code="SALA-01", kind="room")
+    detail_url = reverse("spaces-detail", kwargs={"space_id": space.pk})
+    assert regular_client.get(reverse("spaces-list")).json() == [
+        {"id": space.pk, "code": "SALA-01", "kind": "room"}
+    ]
+    assert regular_client.get(detail_url).json()["id"] == space.pk
+
+    response = request_json(
+        regular_client,
+        "post",
+        reverse("spaces-list"),
+        {"code": "SALA-02", "kind": "room"},
+    )
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "FORBIDDEN"
+
+    response = request_json(regular_client, "patch", detail_url, {"code": "SALA-02"})
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "FORBIDDEN"
+    assert list(Space.objects.values_list("code", flat=True)) == ["SALA-01"]
 
 
 def test_empty_list_create_and_read_in_later_request(logged_in_client):
@@ -137,7 +180,12 @@ def test_duplicate_code_returns_409_without_side_effects(logged_in_client):
         {"code": " LAB-01 ", "kind": "room"},
     )
     assert response.status_code == 409
-    assert "code" in response.json()
+    assert response.json() == {
+        "error": {
+            "code": "DUPLICATE_CODE",
+            "message": "Já existe um espaço com este código.",
+        }
+    }
     assert Space.objects.count() == 2
 
     response = request_json(
@@ -197,6 +245,8 @@ def test_other_database_constraint_is_not_classified_as_duplicate_code():
 def test_invalid_post_returns_400_without_side_effects(logged_in_client, payload):
     response = request_json(logged_in_client, "post", reverse("spaces-list"), payload)
     assert response.status_code == 400
+    assert response.json()["error"]["code"] == "INVALID_REQUEST"
+    assert "details" in response.json()["error"]
     assert Space.objects.count() == 0
 
 
@@ -212,6 +262,7 @@ def test_invalid_patch_returns_400_without_side_effects(logged_in_client, payloa
         payload,
     )
     assert response.status_code == 400
+    assert response.json()["error"]["code"] == "INVALID_REQUEST"
     space.refresh_from_db()
     assert (space.code, space.kind) == ("SALA-01", "room")
 
@@ -220,6 +271,7 @@ def test_invalid_patch_returns_400_without_side_effects(logged_in_client, payloa
 def test_missing_space_returns_404_without_side_effects(logged_in_client, space_id):
     url = reverse("spaces-detail", kwargs={"space_id": space_id})
     assert logged_in_client.get(url).status_code == 404
+    assert logged_in_client.get(url).json()["error"]["code"] == "NOT_FOUND"
     response = request_json(logged_in_client, "patch", url, {"code": "SALA-01"})
     assert response.status_code == 404
     assert Space.objects.count() == 0

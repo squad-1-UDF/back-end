@@ -8,4 +8,4 @@ As funções em `apps.keys.rules` recebem um histórico de `KeyCheckout` e `KeyR
 
 **Disponibilidade nesta etapa significa somente ausência de empréstimo ativo.** Uma chave pode continuar indisponível por motivos físicos ou administrativos que estas funções não conhecem. O chamador deve fornecer o histórico completo e ordenado necessário para validar as associações; uma devolução sem a retirada correspondente é um histórico inválido.
 
-As consultas não acessam Django ORM, PostgreSQL ou HTTP. Elas não bloqueiam retiradas concorrentes nem substituem transações e constraints na persistência futura. Filtros por usuário, paginação, permissões, relatórios e formato de resposta da API dependem do contrato institucional e do esquema de banco ainda pendentes; não são definidos aqui.
+Estas funções puras não acessam Django ORM, PostgreSQL ou HTTP. Os serviços de persistência em [MODELO_CHAVES.md](MODELO_CHAVES.md) usam transações e constraints. Filtros por usuário, paginação, permissões, relatórios e formato de resposta da API continuam pendentes.
