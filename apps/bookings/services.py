@@ -1,10 +1,11 @@
-"""Operações de reservas; a exclusão PostgreSQL decide conflitos concorrentes."""
+"""Operações de reservas com serialização por espaço e exclusão PostgreSQL."""
 
 from django.db import transaction
 from django.utils import timezone
 
 from apps.bookings.models import Booking
 from apps.bookings.rules import is_available, validate_interval
+from apps.spaces.models import Space
 
 
 class BookingAlreadyCancelled(Exception):
@@ -35,6 +36,9 @@ def booking_available(*, space_id, start_at, end_at):
 @transaction.atomic
 def create_booking(*, space, user, start_at, end_at):
     validate_interval(start_at, end_at)
+    # Serializa INSERTs do mesmo espaço antes da constraint GiST; NO KEY UPDATE
+    # mantém compatibilidade com o KEY SHARE usado pela FK da reserva.
+    Space.objects.select_for_update(no_key=True).get(pk=space.pk)
     return Booking.objects.create(
         space=space, user=user, start_at=start_at, end_at=end_at
     )
