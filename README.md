@@ -1,6 +1,6 @@
 # Sistema de Gestão de Laboratórios e Salas — API
 
-Scaffold da API em Python 3.13, Django 5.2 e Django REST Framework. `GET /api/v1/health/` responde `{"status":"ok","service":"labtech-api"}` e verifica apenas o processo HTTP. UC001 oferece `GET /api/v1/auth/csrf/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/logout/` e `GET /api/v1/auth/me/` com sessões Django provisórias. As apps ainda não têm models nem endpoints de domínio.
+API em Python 3.13, Django 5.2 e Django REST Framework. UC001 oferece `GET /api/v1/auth/csrf/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/logout/` e `GET /api/v1/auth/me/` com `auth.User` nativo e sessões Django. As apps ainda não têm models nem endpoints de domínio.
 
 ## Preparar o ambiente local
 
@@ -14,9 +14,25 @@ Scaffold da API em Python 3.13, Django 5.2 e Django REST Framework. `GET /api/v1
 
    Em Linux/macOS, use `python3.13 -m venv .venv` e `source .venv/bin/activate`.
 
-2. Copie `.env.example` para `.env` e troque `DJANGO_SECRET_KEY` por uma chave aleatória. Por exemplo, gere uma com `python -c "import secrets; print(secrets.token_urlsafe(50))"`. O arquivo `.env` é ignorado pelo Git. `DJANGO_DEBUG=true` e as origens de exemplo são apenas para desenvolvimento.
+2. Crie o `.env` local ignorado pelo Git e gere segredos locais:
 
-3. Mantenha `DB_NAME` vazio enquanto o contrato e o servidor PostgreSQL não estiverem disponíveis. Nesse caso, Django usa um backend dummy: o endpoint de saúde e os testes atuais funcionam, mas operações de banco não funcionam. Quando o responsável pelo banco fornecer acesso, preencha `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST` e `DB_PORT` no `.env`. Não execute `migrate` nesta etapa.
+   ```powershell
+   Copy-Item .env.example .env
+   $secret = python -c "import secrets; print(secrets.token_urlsafe(50))"
+   $dbPassword = python -c "import secrets; print(secrets.token_urlsafe(32))"
+   (Get-Content .env) -replace '^DJANGO_SECRET_KEY=.*$', "DJANGO_SECRET_KEY=$secret" -replace '^DB_PASSWORD=.*$', "DB_PASSWORD=$dbPassword" | Set-Content .env
+   ```
+
+3. Inicie o PostgreSQL 16 isolado do Compose e aplique as migrations **somente nesse banco local**. A versão 16 é [suportada pelo Django 5.2](https://docs.djangoproject.com/en/5.2/releases/5.2/#dropped-support-for-postgresql-13) e [continua sob suporte do PostgreSQL](https://www.postgresql.org/support/versioning/):
+
+   ```powershell
+   docker compose up --wait -d db
+   docker compose ps db
+   docker compose build api
+   docker compose run --rm --no-deps api python manage.py migrate
+   ```
+
+   O serviço publica apenas `127.0.0.1:55432` e usa um volume próprio. O comando de migration roda no contêiner da API com `DB_HOST=db`, ligado ao PostgreSQL deste Compose; não usa banco compartilhado, produção ou Neon. `migrate` aplica as migrations nativas de `contenttypes`, `auth` e `sessions` (e dependências instaladas), sem migrations de domínio. Para criar uma conta local, use `python manage.py createsuperuser`.
 
 4. Verifique e inicie a API:
 
@@ -25,7 +41,7 @@ Scaffold da API em Python 3.13, Django 5.2 e Django REST Framework. `GET /api/v1
    python manage.py runserver
    ```
 
-   Acesse `http://127.0.0.1:8000/api/v1/health/`. As rotas HTTP de UC001 existem, mas login e persistência de sessão exigem banco de usuários e sessões configurado; outros endpoints de negócio ainda não existem.
+   Acesse `http://127.0.0.1:8000/api/v1/health/`. O login e a sessão usam o PostgreSQL local; outros endpoints de negócio ainda não existem.
 
 ## Verificações
 
@@ -34,23 +50,35 @@ Com o ambiente ativado e `.env` configurado:
 ```powershell
 python -m pip check
 python -m ruff check .
+python -m ruff format --check .
+python manage.py check
 python -m pytest -q
-python manage.py test
-python manage.py check --deploy
+python -m pytest -q apps/tests/test_auth_postgres.py
 ```
 
-`check --deploy` pode apontar pendências de HTTPS, redirecionamento e HSTS: esses controles dependem da configuração do proxy e do domínio de produção. O servidor `runserver` não é um servidor de produção.
+O pytest-django cria e remove `test_labtech_local`, separado de `labtech_local`, e aplica ali as migrations nativas para os testes integrados. Para executar somente os testes sem banco, faça `$env:DB_DISABLED = "true"; python -m pytest -q; Remove-Item Env:DB_DISABLED`; os testes PostgreSQL ficam ignorados nesse modo, mesmo com `.env` local. O servidor `runserver` não é um servidor de produção.
 
 ## Docker para desenvolvimento
 
-Com Docker ativo e `.env` criado, execute `docker compose up --build`. A API ficará em `http://localhost:8000/api/v1/health/`. A imagem executa o processo como usuário sem privilégios. O Compose não cria PostgreSQL nem aplica migrations. Se o PostgreSQL estiver na máquina hospedeira, use `DB_HOST=host.docker.internal` no `.env` para o contêiner alcançá-lo; `localhost` dentro do contêiner aponta para o próprio contêiner. Se o banco estiver em outro servidor, use o endereço fornecido pela equipe de banco.
+Com Docker ativo e `.env` criado, `docker compose up --build -d` inicia PostgreSQL e API para desenvolvimento. A API fica em `http://127.0.0.1:8000/` por padrão; se a porta estiver ocupada, ajuste `API_PORT` no `.env`. O contêiner usa `DB_HOST=db` e `DB_PORT=5432` e não aplica migrations automaticamente. Para migrar pelo contêiner, use `docker compose exec api python manage.py migrate` somente após verificar que o serviço `db` é o PostgreSQL local do Compose.
 
 ## Integração contínua
 
-O workflow `.github/workflows/ci.yml` roda em pull requests para `main` e em pushes na `main`. Ele instala as dependências de desenvolvimento no Python 3.13 e executa `pip check`, Ruff, `manage.py check` e pytest. Cada execução gera sua própria `DJANGO_SECRET_KEY`; `DB_NAME` fica vazio, sem PostgreSQL ou migrations na CI inicial.
+O job `checks` usa `DB_DISABLED=true` e backend `dummy`, preservando os testes sem banco. O job separado `postgres-uc001` sobe PostgreSQL 16 efêmero; somente esse serviço descartável usa autenticação `trust`, sem senha nos logs. O pytest-django cria seu banco de teste e aplica migrations nativas. Nenhum job depende de banco externo.
+
+## Configuração por ambiente
+
+| Ambiente | Credenciais | Banco |
+|---|---|---|
+| Desenvolvimento local | `.env` ignorado, gerado acima | Compose em `127.0.0.1:55432` |
+| Testes sem banco | `DB_DISABLED=true` no processo (ou `DB_NAME` vazio sem `.env` local) | Backend `dummy`, sem migrations |
+| Testes integrados | `.env` local ou variáveis do job CI | `test_<DB_NAME>` criado pelo pytest-django |
+| Produção | Variáveis injetadas pelo ambiente de implantação, nunca `.env.example` | PostgreSQL externo via `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` |
+
+Em produção, `DJANGO_DEBUG=false` e as políticas de HTTPS, cookies, origem e proxy devem ser configuradas antes da implantação. As migrations de produção são responsabilidade do processo de implantação, fora deste roteiro.
 
 ## Próxima etapa
 
-UC001 tem uma camada HTTP com sessões Django provisórias e rota pública para obter o cookie CSRF, sem schema ou migrations de usuário. A integração real de identidade, sessão e banco ainda depende de decisão. O fluxo de cookies e cabeçalho `X-CSRFToken`, além das pendências de CORS para origens distintas, estão em [docs/API_CONTRATOS_MVP.md](docs/API_CONTRATOS_MVP.md). Consulte também [docs/REQUISITOS_E_CONTRATO.md](docs/REQUISITOS_E_CONTRATO.md).
+UC001 usa provisoriamente `auth.User` nativo. Definir o contrato de responsável, salas, chaves, empréstimos, movimentações e reservas antes de criar migrations de domínio. O fluxo de cookies e `X-CSRFToken`, além das pendências de CORS para origens distintas, estão em [docs/API_CONTRATOS_MVP.md](docs/API_CONTRATOS_MVP.md). As APIs UC003/UC004 e `config/urls.py` não foram alterados nesta etapa.
 
 Licença: [GNU GPL v3](LICENSE).

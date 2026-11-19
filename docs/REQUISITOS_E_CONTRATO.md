@@ -24,7 +24,7 @@ Telas: login, dashboard, lista e detalhe de salas, agenda/disponibilidade, nova 
 
 | Área | Exemplo de endpoint | Ação esperada |
 |---|---|---|
-| Autenticação | `GET /auth/csrf/`, `POST /auth/login/`, `POST /auth/logout/`, `GET /auth/me/` | Camada HTTP provisória com sessões Django e cookie CSRF; identidade e integração com banco pendentes |
+| Autenticação | `GET /auth/csrf/`, `POST /auth/login/`, `POST /auth/logout/`, `GET /auth/me/` | Camada HTTP com sessões Django e cookie CSRF; `auth.User` nativo adotado provisoriamente, com PostgreSQL local e testes de integração separados |
 | Usuários | `/users/` | Operações restritas por papel |
 | Salas | `/spaces/` | Listar e manter salas/laboratórios |
 | Chaves | `/keys/` | Manter e consultar disponibilidade |
@@ -38,8 +38,8 @@ Fora de UC001, endpoints, nomes e campos são **propostas**, não contratos apro
 
 - Nomes das tabelas e colunas, tipos e nulabilidade.
 - PK/FK, índices e constraints (unicidade, reservas conflitantes, exclusão ou desativação).
-- Identidades e permissões: usar `auth_user` nativo Django ou tabela de usuários preexistente? Resolver antes da primeira migration de autenticação.
-- Quem produz e aplica migrations, inclusive as apps nativas do Django.
+- Identidades e permissões: `auth_user` nativo foi adotado provisoriamente para UC001; fechar quem é responsável pela retirada e as permissões antes das migrations de domínio.
+- Definir quem produz e aplica migrations de domínio. As migrations nativas de autenticação e sessão são aplicadas apenas no PostgreSQL local isolado ou banco de teste nesta etapa.
 - Convenções de timestamps e timezone.
 - Estratégia de ambientes (development/test) e criação de bancos de teste.
 

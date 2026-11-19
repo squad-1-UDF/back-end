@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DB_NAME: ""
+      DB_DISABLED: "true"
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -54,3 +55,70 @@ jobs:
 
       - name: Test
         run: python -m pytest -q
+
+  postgres-uc001:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings
+      DB_NAME: labtech_ci
+      DB_USER: labtech
+      DB_PASSWORD: ""
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: labtech_ci
+          POSTGRES_USER: labtech
+          # Apenas o serviço efêmero deste runner; não há senha para registrar em logs.
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U labtech -d labtech_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Generate CI-only Django secret key
+        run: |
+          python - <<'PY'
+          import os
+          import secrets
+
+          secret_key = secrets.token_urlsafe(50)
+          print(f"::add-mask::{secret_key}", flush=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write(f"DJANGO_SECRET_KEY={secret_key}\n")
+          PY
+
+      - name: Install development dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Confirm isolated PostgreSQL test target
+        run: |
+          python - <<'PY'
+          from django.conf import settings
+
+          database = settings.DATABASES["default"]
+          assert database["ENGINE"] == "django.db.backends.postgresql"
+          assert (database["NAME"], database["HOST"], str(database["PORT"])) == (
+              "labtech_ci", "127.0.0.1", "5432"
+          )
+          assert database["TEST"]["NAME"] == "test_labtech_ci"
+          assert database["PASSWORD"] == ""
+          PY
+
+      - name: Test UC001 with PostgreSQL
+        run: python -m pytest -q apps/tests/test_auth_postgres.py

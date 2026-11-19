@@ -1,4 +1,4 @@
-"""Configurações iniciais. Sem definição ou migração de tabelas da aplicação."""
+"""Configurações da API; sem modelos de domínio nesta etapa."""
 
 import os
 from pathlib import Path
@@ -67,18 +67,21 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# Banco gerenciado por outra frente: não criar nem executar migrações aqui.
-# Sem DB_NAME, backend dummy evita criar um SQLite implicitamente.
-if os.getenv("DB_NAME"):
+# DB_DISABLED permite testes sem banco mesmo quando existe um .env local.
+# DB_NAME vazio também mantém os testes de regras puras sem SQLite implícito.
+# Com DB_NAME, o banco vem inteiramente do ambiente (local ou produção).
+if os.getenv("DB_NAME") and os.getenv("DB_DISABLED", "").lower() != "true":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": os.environ["DB_NAME"],
             "USER": os.getenv("DB_USER", ""),
             "PASSWORD": os.getenv("DB_PASSWORD", ""),
-            "HOST": os.getenv("DB_HOST", "localhost"),
+            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
             "PORT": os.getenv("DB_PORT", "5432"),
             "CONN_MAX_AGE": 60,
+            # pytest-django cria este banco separado; nunca reutiliza o banco local.
+            "TEST": {"NAME": f"test_{os.environ['DB_NAME']}"},
         }
     }
 else:
