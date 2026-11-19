@@ -1,4 +1,4 @@
-"""Configurações da API; sem modelos de domínio nesta etapa."""
+"""Configurações da API e do PostgreSQL."""
 
 import os
 from pathlib import Path

@@ -1,6 +1,6 @@
 # Sistema de Gestão de Laboratórios e Salas — API
 
-API em Python 3.13, Django 5.2 e Django REST Framework. UC001 oferece `GET /api/v1/auth/csrf/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/logout/` e `GET /api/v1/auth/me/` com `auth.User` nativo e sessões Django. As apps ainda não têm models nem endpoints de domínio.
+API em Python 3.13, Django 5.2 e Django REST Framework. UC001 oferece `GET /api/v1/auth/csrf/`, `POST /api/v1/auth/login/`, `POST /api/v1/auth/logout/` e `GET /api/v1/auth/me/` com `auth.User` nativo e sessões Django. UC003 já tem o model `Space` e sua migration; a API de espaços permanece pendente de integração.
 
 ## Preparar o ambiente local
 
@@ -32,7 +32,7 @@ API em Python 3.13, Django 5.2 e Django REST Framework. UC001 oferece `GET /api/
    docker compose run --rm --no-deps api python manage.py migrate
    ```
 
-   O serviço publica apenas `127.0.0.1:55432` e usa um volume próprio. O comando de migration roda no contêiner da API com `DB_HOST=db`, ligado ao PostgreSQL deste Compose; não usa banco compartilhado, produção ou Neon. `migrate` aplica as migrations nativas de `contenttypes`, `auth` e `sessions` (e dependências instaladas), sem migrations de domínio. Para criar uma conta local, use `python manage.py createsuperuser`.
+   O serviço publica apenas `127.0.0.1:55432` e usa um volume próprio. O comando de migration roda no contêiner da API com `DB_HOST=db`, ligado ao PostgreSQL deste Compose; não usa banco compartilhado, produção ou Neon. `migrate` aplica as migrations nativas de `contenttypes`, `auth` e `sessions`, além de `spaces.0001_initial`. Para criar uma conta local, use `python manage.py createsuperuser`.
 
 4. Verifique e inicie a API:
 
@@ -41,7 +41,7 @@ API em Python 3.13, Django 5.2 e Django REST Framework. UC001 oferece `GET /api/
    python manage.py runserver
    ```
 
-   Acesse `http://127.0.0.1:8000/api/v1/health/`. O login e a sessão usam o PostgreSQL local; outros endpoints de negócio ainda não existem.
+   Acesse `http://127.0.0.1:8000/api/v1/health/`. O login e a sessão usam o PostgreSQL local. O model de espaços ainda não possui endpoints integrados nesta branch.
 
 ## Verificações
 
@@ -54,9 +54,10 @@ python -m ruff format --check .
 python manage.py check
 python -m pytest -q
 python -m pytest -q apps/tests/test_auth_postgres.py
+python -m pytest -q apps/tests/test_spaces_postgres.py
 ```
 
-O pytest-django cria e remove `test_labtech_local`, separado de `labtech_local`, e aplica ali as migrations nativas para os testes integrados. Para executar somente os testes sem banco, faça `$env:DB_DISABLED = "true"; python -m pytest -q; Remove-Item Env:DB_DISABLED`; os testes PostgreSQL ficam ignorados nesse modo, mesmo com `.env` local. O servidor `runserver` não é um servidor de produção.
+O pytest-django cria e remove `test_labtech_local`, separado de `labtech_local`, e aplica ali as migrations nativas e `spaces.0001_initial` para os testes integrados. Para executar somente os testes sem banco, faça `$env:DB_DISABLED = "true"; python -m pytest -q; Remove-Item Env:DB_DISABLED`; os testes PostgreSQL ficam ignorados nesse modo, mesmo com `.env` local. O servidor `runserver` não é um servidor de produção.
 
 ## Docker para desenvolvimento
 
@@ -64,7 +65,7 @@ Com Docker ativo e `.env` criado, `docker compose up --build -d` inicia PostgreS
 
 ## Integração contínua
 
-O job `checks` usa `DB_DISABLED=true` e backend `dummy`, preservando os testes sem banco. O job separado `postgres-uc001` sobe PostgreSQL 16 efêmero; somente esse serviço descartável usa autenticação `trust`, sem senha nos logs. O pytest-django cria seu banco de teste e aplica migrations nativas. Nenhum job depende de banco externo.
+O job `checks` usa `DB_DISABLED=true` e backend `dummy`, preservando os testes sem banco. O job `postgres-uc001` mantém esse identificador para preservar o check existente e agora executa os testes reais de UC001 e UC003. Ele sobe PostgreSQL 16 efêmero; somente esse serviço descartável usa autenticação `trust`, sem senha nos logs. O pytest-django cria seu banco de teste e aplica migrations nativas e de `spaces`. Nenhum job depende de banco externo.
 
 ## Configuração por ambiente
 
@@ -79,6 +80,6 @@ Em produção, `DJANGO_DEBUG=false` e as políticas de HTTPS, cookies, origem e 
 
 ## Próxima etapa
 
-UC001 usa provisoriamente `auth.User` nativo. Definir o contrato de responsável, salas, chaves, empréstimos, movimentações e reservas antes de criar migrations de domínio. O fluxo de cookies e `X-CSRFToken`, além das pendências de CORS para origens distintas, estão em [docs/API_CONTRATOS_MVP.md](docs/API_CONTRATOS_MVP.md). As APIs UC003/UC004 e `config/urls.py` não foram alterados nesta etapa.
+UC001 usa provisoriamente `auth.User` nativo. O esquema mínimo de salas e laboratórios está em [docs/MODELO_SPACES.md](docs/MODELO_SPACES.md); a integração HTTP permanece com a PR #7. Ainda faltam os contratos de responsáveis, chaves, empréstimos, movimentações e reservas antes das demais migrations de domínio. O fluxo de cookies e `X-CSRFToken`, além das pendências de CORS para origens distintas, estão em [docs/API_CONTRATOS_MVP.md](docs/API_CONTRATOS_MVP.md). As APIs UC003/UC004 e `config/urls.py` não foram alterados nesta etapa.
 
 Licença: [GNU GPL v3](LICENSE).

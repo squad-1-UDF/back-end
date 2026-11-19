@@ -120,5 +120,8 @@ jobs:
           assert database["PASSWORD"] == ""
           PY
 
-      - name: Test UC001 with PostgreSQL
-        run: python -m pytest -q apps/tests/test_auth_postgres.py
+      - name: Test UC001 and UC003 with PostgreSQL
+        run: >-
+          python -m pytest -q
+          apps/tests/test_auth_postgres.py
+          apps/tests/test_spaces_postgres.py
