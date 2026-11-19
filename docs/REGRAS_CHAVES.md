@@ -9,4 +9,4 @@
 
 O chamador deve fornecer o histórico relevante e persistir a nova sequência conforme o contrato de banco futuro. As funções não definem prazos máximos, multas, autorização por perfil ou outras restrições institucionais. Também não verificam indisponibilidade física ou administrativa da chave além de um empréstimo ativo; essas regras ainda precisam ser acordadas.
 
-**Decisões pendentes:** forma das referências e vínculo do responsável com a tabela de usuários, esquema de empréstimos e movimentações, permissões, convenção de timestamps/timezone e eventuais restrições adicionais da chave. A validação em memória não impede duas retiradas concorrentes: a integração com PostgreSQL precisará de transações e constraints que garantam a exclusividade do empréstimo ativo para cada chave. Nenhuma tabela ou migration é criada nesta etapa.
+**Persistência em desenvolvimento:** [MODELO_CHAVES.md](MODELO_CHAVES.md) descreve o schema e os serviços PostgreSQL. As regras puras continuam sem acesso ao banco. Responsáveis e operadores usam provisoriamente `auth.User`; permissões e restrições adicionais ainda dependem de decisão.
