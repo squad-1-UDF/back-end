@@ -38,9 +38,9 @@ Fora de UC001, endpoints, nomes e campos são **propostas**, não contratos apro
 
 - Nomes das tabelas e colunas, tipos e nulabilidade.
 - PK/FK, índices e constraints (unicidade, reservas conflitantes, exclusão ou desativação).
-- Identidades e permissões: `auth_user` nativo foi adotado provisoriamente para UC001; fechar quem é responsável pela retirada e as permissões antes das migrations de domínio.
-- Definir quem produz e aplica migrations de domínio. As migrations nativas de autenticação e sessão são aplicadas apenas no PostgreSQL local isolado ou banco de teste nesta etapa.
+- Identidades e permissões: `auth_user` nativo foi adotado provisoriamente para UC001; fechar quem é responsável pela retirada e as permissões antes das migrations que referenciem pessoas.
+- Definir quem produz e aplica as próximas migrations de domínio. As migrations nativas de autenticação/sessão e `spaces.0001_initial` são aplicadas apenas no PostgreSQL local isolado ou banco de teste nesta etapa.
 - Convenções de timestamps e timezone.
 - Estratégia de ambientes (development/test) e criação de bancos de teste.
 
-Nenhum model de negócio foi criado nesta fase para evitar divergência com o trabalho de modelagem.
+O model mínimo `Space` de UC003 já foi criado com migration própria; sua integração HTTP com a PR #7 permanece pendente. Os demais models de negócio ainda dependem do contrato de dados.
