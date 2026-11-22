@@ -12,8 +12,17 @@ BAD_CSRF_TOKEN = "b" * 32
 
 
 def fake_user(*, active=True, staff=False):
+    # in_admin_group simula a anotação usada pelo papel, evitando o banco.
     return SimpleNamespace(
-        pk=7, is_active=active, is_authenticated=True, is_staff=staff
+        pk=7,
+        username="ana",
+        email="ana@udf.edu.br",
+        is_active=active,
+        is_authenticated=True,
+        is_staff=staff,
+        is_superuser=False,
+        in_admin_group=False,
+        get_full_name=lambda: "Ana Costa",
     )
 
 
@@ -189,7 +198,17 @@ class AuthApiTests(SimpleTestCase):
                 ):
                     response = self.client.get(self.me_url)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.json(), {"id": 7, "is_staff": staff})
+                self.assertEqual(
+                    response.json(),
+                    {
+                        "id": 7,
+                        "username": "ana",
+                        "name": "Ana Costa",
+                        "email": "ana@udf.edu.br",
+                        "role": "employee" if staff else "student",
+                        "is_staff": staff,
+                    },
+                )
 
     def test_logout_requires_csrf_for_authenticated_request(self):
         with (

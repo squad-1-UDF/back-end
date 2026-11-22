@@ -76,7 +76,14 @@ def test_uc001_real_login_session_and_logout(is_staff):
     later_client.cookies["sessionid"] = session_key
     me = later_client.get(reverse("auth-me"))
     assert me.status_code == 200
-    assert me.json() == {"id": user.pk, "is_staff": is_staff}
+    assert me.json() == {
+        "id": user.pk,
+        "username": "ana",
+        "name": "ana",
+        "email": "",
+        "role": "employee" if is_staff else "student",
+        "is_staff": is_staff,
+    }
 
     # O login renova o token CSRF; use o cookie atual para o logout.
     logout = post_json(
