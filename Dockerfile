@@ -5,6 +5,7 @@ COPY pyproject.toml ./
 COPY config ./config
 COPY apps ./apps
 COPY manage.py ./
+COPY scripts ./scripts
 RUN python -m pip install --no-cache-dir .
 RUN useradd --system --uid 10001 --no-create-home app
 USER app
