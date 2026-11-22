@@ -462,3 +462,44 @@ def test_history_endpoints_are_read_only(actors):
         response = post_json(client, reverse(name, args=[key.pk]), {})
         assert response.status_code == 405
     assert not KeyMovement.objects.exists()
+
+
+def test_devolucao_e_nova_retirada_no_mesmo_instante_nao_quebram_o_historico(actors):
+    """Troca de responsável no mesmo minuto, gravada com a retirada antes da devolução."""
+    key, staff, responsible, _ = actors
+    troca = datetime(2026, 10, 30, 12, tzinfo=UTC)
+    primeiro = KeyLoan.objects.create(
+        key=key,
+        responsible=responsible,
+        checkout_operator=staff,
+        checked_out_at=AT,
+        returned_at=troca,
+        return_operator=staff,
+    )
+    segundo = KeyLoan.objects.create(
+        key=key, responsible=staff, checkout_operator=staff, checked_out_at=troca
+    )
+    KeyMovement.objects.create(
+        loan=primeiro, kind="checkout", occurred_at=AT, operator=staff
+    )
+    KeyMovement.objects.create(
+        loan=segundo, kind="checkout", occurred_at=troca, operator=staff
+    )
+    KeyMovement.objects.create(
+        loan=primeiro, kind="return", occurred_at=troca, operator=staff
+    )
+
+    devolvido = return_key(
+        loan_id=segundo.pk,
+        operator=staff,
+        occurred_at=datetime(2026, 10, 30, 13, tzinfo=UTC),
+    )
+
+    assert devolvido.returned_at is not None
+    novo = checkout_key(
+        key_id=key.pk,
+        responsible=responsible,
+        operator=staff,
+        occurred_at=datetime(2026, 10, 30, 14, tzinfo=UTC),
+    )
+    assert novo.returned_at is None

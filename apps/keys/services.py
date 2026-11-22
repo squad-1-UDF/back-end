@@ -96,7 +96,11 @@ def update_key(*, key_id, changes):
 
 
 def movements_for_key(key):
-    return KeyMovement.objects.filter(loan__key=key).order_by("occurred_at", "id")
+    # Empate de horário: segue a ordem dos empréstimos (o anterior é devolvido antes
+    # da retirada seguinte) e, no mesmo empréstimo, a retirada vem antes da devolução.
+    return KeyMovement.objects.filter(loan__key=key).order_by(
+        "occurred_at", "loan_id", "id"
+    )
 
 
 def _rule_history(key):
