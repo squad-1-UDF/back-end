@@ -1,0 +1,1423 @@
+{
+  "_sobre": "Dados fictícios de demonstração do LabTech. Sem dados pessoais reais.",
+  "auth_user": [
+    {
+      "id": 1,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "operador.1",
+      "first_name": "Operador",
+      "last_name": "Teste 1",
+      "email": "operador.1@exemplo.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 2,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "operador.2",
+      "first_name": "Operador",
+      "last_name": "Teste 2",
+      "email": "operador.2@exemplo.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 3,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "coordenacao",
+      "first_name": "Coordenação",
+      "last_name": "Teste",
+      "email": "coordenacao@exemplo.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 4,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "professor.1",
+      "first_name": "Professor",
+      "last_name": "Teste 1",
+      "email": "professor.1@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 5,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "professor.2",
+      "first_name": "Professor",
+      "last_name": "Teste 2",
+      "email": "professor.2@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 6,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "professor.3",
+      "first_name": "Professor",
+      "last_name": "Teste 3",
+      "email": "professor.3@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 7,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "professor.4",
+      "first_name": "Professor",
+      "last_name": "Teste 4",
+      "email": "professor.4@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 8,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.1",
+      "first_name": "Aluno",
+      "last_name": "Teste 1",
+      "email": "aluno.1@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 9,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.2",
+      "first_name": "Aluno",
+      "last_name": "Teste 2",
+      "email": "aluno.2@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 10,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.3",
+      "first_name": "Aluno",
+      "last_name": "Teste 3",
+      "email": "aluno.3@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 11,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.4",
+      "first_name": "Aluno",
+      "last_name": "Teste 4",
+      "email": "aluno.4@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    },
+    {
+      "id": 12,
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.5",
+      "first_name": "Aluno",
+      "last_name": "Teste 5",
+      "email": "aluno.5@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00"
+    }
+  ],
+  "spaces_space": [
+    {
+      "id": 1,
+      "code": "LAB-01",
+      "kind": "laboratory"
+    },
+    {
+      "id": 2,
+      "code": "LAB-02",
+      "kind": "laboratory"
+    },
+    {
+      "id": 3,
+      "code": "LAB-03",
+      "kind": "laboratory"
+    },
+    {
+      "id": 4,
+      "code": "LAB-REDES",
+      "kind": "laboratory"
+    },
+    {
+      "id": 5,
+      "code": "SALA-101",
+      "kind": "room"
+    },
+    {
+      "id": 6,
+      "code": "SALA-102",
+      "kind": "room"
+    },
+    {
+      "id": 7,
+      "code": "SALA-201",
+      "kind": "room"
+    },
+    {
+      "id": 8,
+      "code": "SALA-202",
+      "kind": "room"
+    },
+    {
+      "id": 9,
+      "code": "AUDITORIO",
+      "kind": "room"
+    },
+    {
+      "id": 10,
+      "code": "SALA-REUNIAO",
+      "kind": "room"
+    }
+  ],
+  "keys_key": [
+    {
+      "id": 1,
+      "space_id": 1
+    },
+    {
+      "id": 2,
+      "space_id": 1
+    },
+    {
+      "id": 3,
+      "space_id": 2
+    },
+    {
+      "id": 4,
+      "space_id": 2
+    },
+    {
+      "id": 5,
+      "space_id": 3
+    },
+    {
+      "id": 6,
+      "space_id": 3
+    },
+    {
+      "id": 7,
+      "space_id": 4
+    },
+    {
+      "id": 8,
+      "space_id": 4
+    },
+    {
+      "id": 9,
+      "space_id": 5
+    },
+    {
+      "id": 10,
+      "space_id": 6
+    },
+    {
+      "id": 11,
+      "space_id": 7
+    },
+    {
+      "id": 12,
+      "space_id": 8
+    },
+    {
+      "id": 13,
+      "space_id": 9
+    }
+  ],
+  "keys_keyloan": [
+    {
+      "id": 1,
+      "checked_out_at": "2026-11-03T08:00:00-03:00",
+      "returned_at": "2026-11-03T09:50:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 8,
+      "responsible_id": 5,
+      "return_operator_id": 3
+    },
+    {
+      "id": 2,
+      "checked_out_at": "2026-11-03T09:30:00-03:00",
+      "returned_at": "2026-11-03T11:20:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 1,
+      "responsible_id": 9,
+      "return_operator_id": 2
+    },
+    {
+      "id": 3,
+      "checked_out_at": "2026-11-03T10:05:00-03:00",
+      "returned_at": "2026-11-03T10:55:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 13,
+      "responsible_id": 5,
+      "return_operator_id": 3
+    },
+    {
+      "id": 4,
+      "checked_out_at": "2026-11-04T08:10:00-03:00",
+      "returned_at": "2026-11-04T09:00:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 10,
+      "responsible_id": 11,
+      "return_operator_id": 1
+    },
+    {
+      "id": 5,
+      "checked_out_at": "2026-11-04T18:30:00-03:00",
+      "returned_at": "2026-11-04T20:10:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 13,
+      "responsible_id": 10,
+      "return_operator_id": 1
+    },
+    {
+      "id": 6,
+      "checked_out_at": "2026-11-09T08:05:00-03:00",
+      "returned_at": "2026-11-09T09:35:00-03:00",
+      "checkout_operator_id": 1,
+      "key_id": 13,
+      "responsible_id": 11,
+      "return_operator_id": 1
+    },
+    {
+      "id": 7,
+      "checked_out_at": "2026-11-09T18:20:00-03:00",
+      "returned_at": "2026-11-09T21:20:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 4,
+      "responsible_id": 12,
+      "return_operator_id": 2
+    },
+    {
+      "id": 8,
+      "checked_out_at": "2026-11-10T10:20:00-03:00",
+      "returned_at": "2026-11-10T12:00:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 11,
+      "responsible_id": 10,
+      "return_operator_id": 2
+    },
+    {
+      "id": 9,
+      "checked_out_at": "2026-11-10T19:30:00-03:00",
+      "returned_at": "2026-11-10T23:10:00-03:00",
+      "checkout_operator_id": 1,
+      "key_id": 2,
+      "responsible_id": 12,
+      "return_operator_id": 1
+    },
+    {
+      "id": 10,
+      "checked_out_at": "2026-11-11T14:30:00-03:00",
+      "returned_at": "2026-11-11T15:20:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 13,
+      "responsible_id": 7,
+      "return_operator_id": 2
+    },
+    {
+      "id": 11,
+      "checked_out_at": "2026-11-11T19:30:00-03:00",
+      "returned_at": "2026-11-11T21:20:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 2,
+      "responsible_id": 8,
+      "return_operator_id": 3
+    },
+    {
+      "id": 12,
+      "checked_out_at": "2026-11-12T09:30:00-03:00",
+      "returned_at": "2026-11-12T11:10:00-03:00",
+      "checkout_operator_id": 1,
+      "key_id": 5,
+      "responsible_id": 9,
+      "return_operator_id": 3
+    },
+    {
+      "id": 13,
+      "checked_out_at": "2026-11-12T15:00:00-03:00",
+      "returned_at": "2026-11-12T16:50:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 6,
+      "responsible_id": 11,
+      "return_operator_id": 3
+    },
+    {
+      "id": 14,
+      "checked_out_at": "2026-11-13T08:10:00-03:00",
+      "returned_at": "2026-11-13T09:00:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 12,
+      "responsible_id": 8,
+      "return_operator_id": 3
+    },
+    {
+      "id": 15,
+      "checked_out_at": "2026-11-16T10:00:00-03:00",
+      "returned_at": "2026-11-16T13:00:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 8,
+      "responsible_id": 7,
+      "return_operator_id": 1
+    },
+    {
+      "id": 16,
+      "checked_out_at": "2026-11-16T15:20:00-03:00",
+      "returned_at": "2026-11-16T16:50:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 12,
+      "responsible_id": 5,
+      "return_operator_id": 1
+    },
+    {
+      "id": 17,
+      "checked_out_at": "2026-11-17T09:20:00-03:00",
+      "returned_at": "2026-11-17T11:00:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 3,
+      "responsible_id": 10,
+      "return_operator_id": 3
+    },
+    {
+      "id": 18,
+      "checked_out_at": "2026-11-17T13:05:00-03:00",
+      "returned_at": "2026-11-17T14:35:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 13,
+      "responsible_id": 6,
+      "return_operator_id": 2
+    },
+    {
+      "id": 19,
+      "checked_out_at": "2026-11-17T13:20:00-03:00",
+      "returned_at": "2026-11-17T15:00:00-03:00",
+      "checkout_operator_id": 1,
+      "key_id": 6,
+      "responsible_id": 11,
+      "return_operator_id": 2
+    },
+    {
+      "id": 20,
+      "checked_out_at": "2026-11-17T14:05:00-03:00",
+      "returned_at": "2026-11-17T14:55:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 5,
+      "responsible_id": 11,
+      "return_operator_id": 3
+    },
+    {
+      "id": 21,
+      "checked_out_at": "2026-11-17T14:30:00-03:00",
+      "returned_at": "2026-11-17T18:10:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 2,
+      "responsible_id": 8,
+      "return_operator_id": 2
+    },
+    {
+      "id": 22,
+      "checked_out_at": "2026-11-18T09:30:00-03:00",
+      "returned_at": "2026-11-18T11:00:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 12,
+      "responsible_id": 6,
+      "return_operator_id": 3
+    },
+    {
+      "id": 23,
+      "checked_out_at": "2026-11-18T18:20:00-03:00",
+      "returned_at": "2026-11-18T22:00:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 11,
+      "responsible_id": 12,
+      "return_operator_id": 2
+    },
+    {
+      "id": 24,
+      "checked_out_at": "2026-11-18T18:20:00-03:00",
+      "returned_at": "2026-11-18T20:10:00-03:00",
+      "checkout_operator_id": 1,
+      "key_id": 9,
+      "responsible_id": 8,
+      "return_operator_id": 2
+    },
+    {
+      "id": 25,
+      "checked_out_at": "2026-11-19T10:05:00-03:00",
+      "returned_at": "2026-11-19T10:55:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 10,
+      "responsible_id": 12,
+      "return_operator_id": 1
+    },
+    {
+      "id": 26,
+      "checked_out_at": "2026-11-19T10:20:00-03:00",
+      "returned_at": "2026-11-19T11:10:00-03:00",
+      "checkout_operator_id": 1,
+      "key_id": 9,
+      "responsible_id": 5,
+      "return_operator_id": 2
+    },
+    {
+      "id": 27,
+      "checked_out_at": "2026-11-19T14:20:00-03:00",
+      "returned_at": "2026-11-19T17:20:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 6,
+      "responsible_id": 6,
+      "return_operator_id": 1
+    },
+    {
+      "id": 28,
+      "checked_out_at": "2026-11-19T19:20:00-03:00",
+      "returned_at": "2026-11-19T22:20:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 7,
+      "responsible_id": 4,
+      "return_operator_id": 1
+    },
+    {
+      "id": 29,
+      "checked_out_at": "2026-11-20T08:10:00-03:00",
+      "returned_at": "2026-11-20T09:50:00-03:00",
+      "checkout_operator_id": 1,
+      "key_id": 10,
+      "responsible_id": 8,
+      "return_operator_id": 2
+    },
+    {
+      "id": 30,
+      "checked_out_at": "2026-11-20T10:20:00-03:00",
+      "returned_at": "2026-11-20T14:00:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 8,
+      "responsible_id": 6,
+      "return_operator_id": 1
+    },
+    {
+      "id": 31,
+      "checked_out_at": "2026-11-20T13:30:00-03:00",
+      "returned_at": "2026-11-20T14:20:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 4,
+      "responsible_id": 12,
+      "return_operator_id": 2
+    },
+    {
+      "id": 32,
+      "checked_out_at": "2026-11-20T14:10:00-03:00",
+      "returned_at": "2026-11-20T15:00:00-03:00",
+      "checkout_operator_id": 1,
+      "key_id": 1,
+      "responsible_id": 11,
+      "return_operator_id": 3
+    },
+    {
+      "id": 33,
+      "checked_out_at": "2026-11-20T14:20:00-03:00",
+      "returned_at": "2026-11-20T17:20:00-03:00",
+      "checkout_operator_id": 2,
+      "key_id": 4,
+      "responsible_id": 5,
+      "return_operator_id": 1
+    },
+    {
+      "id": 34,
+      "checked_out_at": "2026-11-20T19:10:00-03:00",
+      "returned_at": "2026-11-20T20:50:00-03:00",
+      "checkout_operator_id": 3,
+      "key_id": 11,
+      "responsible_id": 9,
+      "return_operator_id": 3
+    },
+    {
+      "id": 35,
+      "checked_out_at": "2026-11-21T08:30:00-03:00",
+      "returned_at": null,
+      "checkout_operator_id": 2,
+      "key_id": 1,
+      "responsible_id": 6,
+      "return_operator_id": null
+    },
+    {
+      "id": 36,
+      "checked_out_at": "2026-11-21T08:00:00-03:00",
+      "returned_at": null,
+      "checkout_operator_id": 2,
+      "key_id": 2,
+      "responsible_id": 8,
+      "return_operator_id": null
+    },
+    {
+      "id": 37,
+      "checked_out_at": "2026-11-21T07:30:00-03:00",
+      "returned_at": null,
+      "checkout_operator_id": 2,
+      "key_id": 3,
+      "responsible_id": 5,
+      "return_operator_id": null
+    }
+  ],
+  "keys_keymovement": [
+    {
+      "id": 1,
+      "kind": "checkout",
+      "occurred_at": "2026-11-03T08:00:00-03:00",
+      "loan_id": 1,
+      "operator_id": 3
+    },
+    {
+      "id": 2,
+      "kind": "checkout",
+      "occurred_at": "2026-11-03T09:30:00-03:00",
+      "loan_id": 2,
+      "operator_id": 3
+    },
+    {
+      "id": 3,
+      "kind": "return",
+      "occurred_at": "2026-11-03T09:50:00-03:00",
+      "loan_id": 1,
+      "operator_id": 3
+    },
+    {
+      "id": 4,
+      "kind": "checkout",
+      "occurred_at": "2026-11-03T10:05:00-03:00",
+      "loan_id": 3,
+      "operator_id": 3
+    },
+    {
+      "id": 5,
+      "kind": "return",
+      "occurred_at": "2026-11-03T10:55:00-03:00",
+      "loan_id": 3,
+      "operator_id": 3
+    },
+    {
+      "id": 6,
+      "kind": "return",
+      "occurred_at": "2026-11-03T11:20:00-03:00",
+      "loan_id": 2,
+      "operator_id": 2
+    },
+    {
+      "id": 7,
+      "kind": "checkout",
+      "occurred_at": "2026-11-04T08:10:00-03:00",
+      "loan_id": 4,
+      "operator_id": 2
+    },
+    {
+      "id": 8,
+      "kind": "return",
+      "occurred_at": "2026-11-04T09:00:00-03:00",
+      "loan_id": 4,
+      "operator_id": 1
+    },
+    {
+      "id": 9,
+      "kind": "checkout",
+      "occurred_at": "2026-11-04T18:30:00-03:00",
+      "loan_id": 5,
+      "operator_id": 2
+    },
+    {
+      "id": 10,
+      "kind": "return",
+      "occurred_at": "2026-11-04T20:10:00-03:00",
+      "loan_id": 5,
+      "operator_id": 1
+    },
+    {
+      "id": 11,
+      "kind": "checkout",
+      "occurred_at": "2026-11-09T08:05:00-03:00",
+      "loan_id": 6,
+      "operator_id": 1
+    },
+    {
+      "id": 12,
+      "kind": "return",
+      "occurred_at": "2026-11-09T09:35:00-03:00",
+      "loan_id": 6,
+      "operator_id": 1
+    },
+    {
+      "id": 13,
+      "kind": "checkout",
+      "occurred_at": "2026-11-09T18:20:00-03:00",
+      "loan_id": 7,
+      "operator_id": 2
+    },
+    {
+      "id": 14,
+      "kind": "return",
+      "occurred_at": "2026-11-09T21:20:00-03:00",
+      "loan_id": 7,
+      "operator_id": 2
+    },
+    {
+      "id": 15,
+      "kind": "checkout",
+      "occurred_at": "2026-11-10T10:20:00-03:00",
+      "loan_id": 8,
+      "operator_id": 2
+    },
+    {
+      "id": 16,
+      "kind": "return",
+      "occurred_at": "2026-11-10T12:00:00-03:00",
+      "loan_id": 8,
+      "operator_id": 2
+    },
+    {
+      "id": 17,
+      "kind": "checkout",
+      "occurred_at": "2026-11-10T19:30:00-03:00",
+      "loan_id": 9,
+      "operator_id": 1
+    },
+    {
+      "id": 18,
+      "kind": "return",
+      "occurred_at": "2026-11-10T23:10:00-03:00",
+      "loan_id": 9,
+      "operator_id": 1
+    },
+    {
+      "id": 19,
+      "kind": "checkout",
+      "occurred_at": "2026-11-11T14:30:00-03:00",
+      "loan_id": 10,
+      "operator_id": 3
+    },
+    {
+      "id": 20,
+      "kind": "return",
+      "occurred_at": "2026-11-11T15:20:00-03:00",
+      "loan_id": 10,
+      "operator_id": 2
+    },
+    {
+      "id": 21,
+      "kind": "checkout",
+      "occurred_at": "2026-11-11T19:30:00-03:00",
+      "loan_id": 11,
+      "operator_id": 2
+    },
+    {
+      "id": 22,
+      "kind": "return",
+      "occurred_at": "2026-11-11T21:20:00-03:00",
+      "loan_id": 11,
+      "operator_id": 3
+    },
+    {
+      "id": 23,
+      "kind": "checkout",
+      "occurred_at": "2026-11-12T09:30:00-03:00",
+      "loan_id": 12,
+      "operator_id": 1
+    },
+    {
+      "id": 24,
+      "kind": "return",
+      "occurred_at": "2026-11-12T11:10:00-03:00",
+      "loan_id": 12,
+      "operator_id": 3
+    },
+    {
+      "id": 25,
+      "kind": "checkout",
+      "occurred_at": "2026-11-12T15:00:00-03:00",
+      "loan_id": 13,
+      "operator_id": 3
+    },
+    {
+      "id": 26,
+      "kind": "return",
+      "occurred_at": "2026-11-12T16:50:00-03:00",
+      "loan_id": 13,
+      "operator_id": 3
+    },
+    {
+      "id": 27,
+      "kind": "checkout",
+      "occurred_at": "2026-11-13T08:10:00-03:00",
+      "loan_id": 14,
+      "operator_id": 3
+    },
+    {
+      "id": 28,
+      "kind": "return",
+      "occurred_at": "2026-11-13T09:00:00-03:00",
+      "loan_id": 14,
+      "operator_id": 3
+    },
+    {
+      "id": 29,
+      "kind": "checkout",
+      "occurred_at": "2026-11-16T10:00:00-03:00",
+      "loan_id": 15,
+      "operator_id": 2
+    },
+    {
+      "id": 30,
+      "kind": "return",
+      "occurred_at": "2026-11-16T13:00:00-03:00",
+      "loan_id": 15,
+      "operator_id": 1
+    },
+    {
+      "id": 31,
+      "kind": "checkout",
+      "occurred_at": "2026-11-16T15:20:00-03:00",
+      "loan_id": 16,
+      "operator_id": 2
+    },
+    {
+      "id": 32,
+      "kind": "return",
+      "occurred_at": "2026-11-16T16:50:00-03:00",
+      "loan_id": 16,
+      "operator_id": 1
+    },
+    {
+      "id": 33,
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T09:20:00-03:00",
+      "loan_id": 17,
+      "operator_id": 2
+    },
+    {
+      "id": 34,
+      "kind": "return",
+      "occurred_at": "2026-11-17T11:00:00-03:00",
+      "loan_id": 17,
+      "operator_id": 3
+    },
+    {
+      "id": 35,
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T13:05:00-03:00",
+      "loan_id": 18,
+      "operator_id": 3
+    },
+    {
+      "id": 36,
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T13:20:00-03:00",
+      "loan_id": 19,
+      "operator_id": 1
+    },
+    {
+      "id": 37,
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T14:05:00-03:00",
+      "loan_id": 20,
+      "operator_id": 2
+    },
+    {
+      "id": 38,
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T14:30:00-03:00",
+      "loan_id": 21,
+      "operator_id": 2
+    },
+    {
+      "id": 39,
+      "kind": "return",
+      "occurred_at": "2026-11-17T14:35:00-03:00",
+      "loan_id": 18,
+      "operator_id": 2
+    },
+    {
+      "id": 40,
+      "kind": "return",
+      "occurred_at": "2026-11-17T14:55:00-03:00",
+      "loan_id": 20,
+      "operator_id": 3
+    },
+    {
+      "id": 41,
+      "kind": "return",
+      "occurred_at": "2026-11-17T15:00:00-03:00",
+      "loan_id": 19,
+      "operator_id": 2
+    },
+    {
+      "id": 42,
+      "kind": "return",
+      "occurred_at": "2026-11-17T18:10:00-03:00",
+      "loan_id": 21,
+      "operator_id": 2
+    },
+    {
+      "id": 43,
+      "kind": "checkout",
+      "occurred_at": "2026-11-18T09:30:00-03:00",
+      "loan_id": 22,
+      "operator_id": 2
+    },
+    {
+      "id": 44,
+      "kind": "return",
+      "occurred_at": "2026-11-18T11:00:00-03:00",
+      "loan_id": 22,
+      "operator_id": 3
+    },
+    {
+      "id": 45,
+      "kind": "checkout",
+      "occurred_at": "2026-11-18T18:20:00-03:00",
+      "loan_id": 23,
+      "operator_id": 3
+    },
+    {
+      "id": 46,
+      "kind": "checkout",
+      "occurred_at": "2026-11-18T18:20:00-03:00",
+      "loan_id": 24,
+      "operator_id": 1
+    },
+    {
+      "id": 47,
+      "kind": "return",
+      "occurred_at": "2026-11-18T20:10:00-03:00",
+      "loan_id": 24,
+      "operator_id": 2
+    },
+    {
+      "id": 48,
+      "kind": "return",
+      "occurred_at": "2026-11-18T22:00:00-03:00",
+      "loan_id": 23,
+      "operator_id": 2
+    },
+    {
+      "id": 49,
+      "kind": "checkout",
+      "occurred_at": "2026-11-19T10:05:00-03:00",
+      "loan_id": 25,
+      "operator_id": 3
+    },
+    {
+      "id": 50,
+      "kind": "checkout",
+      "occurred_at": "2026-11-19T10:20:00-03:00",
+      "loan_id": 26,
+      "operator_id": 1
+    },
+    {
+      "id": 51,
+      "kind": "return",
+      "occurred_at": "2026-11-19T10:55:00-03:00",
+      "loan_id": 25,
+      "operator_id": 1
+    },
+    {
+      "id": 52,
+      "kind": "return",
+      "occurred_at": "2026-11-19T11:10:00-03:00",
+      "loan_id": 26,
+      "operator_id": 2
+    },
+    {
+      "id": 53,
+      "kind": "checkout",
+      "occurred_at": "2026-11-19T14:20:00-03:00",
+      "loan_id": 27,
+      "operator_id": 2
+    },
+    {
+      "id": 54,
+      "kind": "return",
+      "occurred_at": "2026-11-19T17:20:00-03:00",
+      "loan_id": 27,
+      "operator_id": 1
+    },
+    {
+      "id": 55,
+      "kind": "checkout",
+      "occurred_at": "2026-11-19T19:20:00-03:00",
+      "loan_id": 28,
+      "operator_id": 2
+    },
+    {
+      "id": 56,
+      "kind": "return",
+      "occurred_at": "2026-11-19T22:20:00-03:00",
+      "loan_id": 28,
+      "operator_id": 1
+    },
+    {
+      "id": 57,
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T08:10:00-03:00",
+      "loan_id": 29,
+      "operator_id": 1
+    },
+    {
+      "id": 58,
+      "kind": "return",
+      "occurred_at": "2026-11-20T09:50:00-03:00",
+      "loan_id": 29,
+      "operator_id": 2
+    },
+    {
+      "id": 59,
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T10:20:00-03:00",
+      "loan_id": 30,
+      "operator_id": 3
+    },
+    {
+      "id": 60,
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T13:30:00-03:00",
+      "loan_id": 31,
+      "operator_id": 2
+    },
+    {
+      "id": 61,
+      "kind": "return",
+      "occurred_at": "2026-11-20T14:00:00-03:00",
+      "loan_id": 30,
+      "operator_id": 1
+    },
+    {
+      "id": 62,
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T14:10:00-03:00",
+      "loan_id": 32,
+      "operator_id": 1
+    },
+    {
+      "id": 63,
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T14:20:00-03:00",
+      "loan_id": 33,
+      "operator_id": 2
+    },
+    {
+      "id": 64,
+      "kind": "return",
+      "occurred_at": "2026-11-20T14:20:00-03:00",
+      "loan_id": 31,
+      "operator_id": 2
+    },
+    {
+      "id": 65,
+      "kind": "return",
+      "occurred_at": "2026-11-20T15:00:00-03:00",
+      "loan_id": 32,
+      "operator_id": 3
+    },
+    {
+      "id": 66,
+      "kind": "return",
+      "occurred_at": "2026-11-20T17:20:00-03:00",
+      "loan_id": 33,
+      "operator_id": 1
+    },
+    {
+      "id": 67,
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T19:10:00-03:00",
+      "loan_id": 34,
+      "operator_id": 3
+    },
+    {
+      "id": 68,
+      "kind": "return",
+      "occurred_at": "2026-11-20T20:50:00-03:00",
+      "loan_id": 34,
+      "operator_id": 3
+    },
+    {
+      "id": 69,
+      "kind": "checkout",
+      "occurred_at": "2026-11-21T08:30:00-03:00",
+      "loan_id": 35,
+      "operator_id": 2
+    },
+    {
+      "id": 70,
+      "kind": "checkout",
+      "occurred_at": "2026-11-21T08:00:00-03:00",
+      "loan_id": 36,
+      "operator_id": 2
+    },
+    {
+      "id": 71,
+      "kind": "checkout",
+      "occurred_at": "2026-11-21T07:30:00-03:00",
+      "loan_id": 37,
+      "operator_id": 2
+    }
+  ],
+  "bookings_booking": [
+    {
+      "id": 1,
+      "start_at": "2026-11-18T14:00:00-03:00",
+      "end_at": "2026-11-18T16:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-13T11:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 5,
+      "user_id": 7
+    },
+    {
+      "id": 2,
+      "start_at": "2026-11-17T16:00:00-03:00",
+      "end_at": "2026-11-17T18:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-13T15:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 9,
+      "user_id": 6
+    },
+    {
+      "id": 3,
+      "start_at": "2026-11-19T14:00:00-03:00",
+      "end_at": "2026-11-19T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-14T08:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 5,
+      "user_id": 4
+    },
+    {
+      "id": 4,
+      "start_at": "2026-11-18T14:00:00-03:00",
+      "end_at": "2026-11-18T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-14T13:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 2,
+      "user_id": 4
+    },
+    {
+      "id": 5,
+      "start_at": "2026-11-18T09:00:00-03:00",
+      "end_at": "2026-11-18T10:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-15T06:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 9,
+      "user_id": 4
+    },
+    {
+      "id": 6,
+      "start_at": "2026-11-18T13:00:00-03:00",
+      "end_at": "2026-11-18T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-15T12:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 3,
+      "user_id": 7
+    },
+    {
+      "id": 7,
+      "start_at": "2026-11-17T19:00:00-03:00",
+      "end_at": "2026-11-17T21:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-15T15:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 6,
+      "user_id": 4
+    },
+    {
+      "id": 8,
+      "start_at": "2026-11-18T09:00:00-03:00",
+      "end_at": "2026-11-18T11:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-16T03:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 6,
+      "user_id": 6
+    },
+    {
+      "id": 9,
+      "start_at": "2026-11-20T09:00:00-03:00",
+      "end_at": "2026-11-20T11:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-16T04:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 3,
+      "user_id": 4
+    },
+    {
+      "id": 10,
+      "start_at": "2026-11-18T08:00:00-03:00",
+      "end_at": "2026-11-18T09:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-16T05:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 3,
+      "user_id": 5
+    },
+    {
+      "id": 11,
+      "start_at": "2026-11-20T16:00:00-03:00",
+      "end_at": "2026-11-20T18:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-16T13:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 5,
+      "user_id": 4
+    },
+    {
+      "id": 12,
+      "start_at": "2026-11-18T19:00:00-03:00",
+      "end_at": "2026-11-18T21:00:00-03:00",
+      "status": "cancelled",
+      "created_at": "2026-11-16T14:00:00-03:00",
+      "cancelled_at": "2026-11-16T19:00:00-03:00",
+      "space_id": 4,
+      "user_id": 5
+    },
+    {
+      "id": 13,
+      "start_at": "2026-11-23T15:00:00-03:00",
+      "end_at": "2026-11-23T17:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-18T10:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 6,
+      "user_id": 4
+    },
+    {
+      "id": 14,
+      "start_at": "2026-11-23T14:00:00-03:00",
+      "end_at": "2026-11-23T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-18T11:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 6,
+      "user_id": 6
+    },
+    {
+      "id": 15,
+      "start_at": "2026-11-20T16:00:00-03:00",
+      "end_at": "2026-11-20T17:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-18T12:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 6,
+      "user_id": 5
+    },
+    {
+      "id": 16,
+      "start_at": "2026-11-23T08:00:00-03:00",
+      "end_at": "2026-11-23T09:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-19T04:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 5,
+      "user_id": 6
+    },
+    {
+      "id": 17,
+      "start_at": "2026-11-24T10:30:00-03:00",
+      "end_at": "2026-11-24T11:30:00-03:00",
+      "status": "cancelled",
+      "created_at": "2026-11-19T09:00:00-03:00",
+      "cancelled_at": "2026-11-20T06:00:00-03:00",
+      "space_id": 1,
+      "user_id": 5
+    },
+    {
+      "id": 18,
+      "start_at": "2026-11-23T13:00:00-03:00",
+      "end_at": "2026-11-23T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-19T11:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 4,
+      "user_id": 5
+    },
+    {
+      "id": 19,
+      "start_at": "2026-11-23T13:00:00-03:00",
+      "end_at": "2026-11-23T14:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-19T12:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 8,
+      "user_id": 4
+    },
+    {
+      "id": 20,
+      "start_at": "2026-11-24T11:00:00-03:00",
+      "end_at": "2026-11-24T12:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-20T09:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 1,
+      "user_id": 4
+    },
+    {
+      "id": 21,
+      "start_at": "2026-11-23T08:00:00-03:00",
+      "end_at": "2026-11-23T09:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T03:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 8,
+      "user_id": 4
+    },
+    {
+      "id": 22,
+      "start_at": "2026-11-24T10:00:00-03:00",
+      "end_at": "2026-11-24T11:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T06:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 1,
+      "user_id": 5
+    },
+    {
+      "id": 23,
+      "start_at": "2026-11-25T11:00:00-03:00",
+      "end_at": "2026-11-25T12:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T07:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 1,
+      "user_id": 4
+    },
+    {
+      "id": 24,
+      "start_at": "2026-11-23T15:00:00-03:00",
+      "end_at": "2026-11-23T16:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 9,
+      "user_id": 7
+    },
+    {
+      "id": 25,
+      "start_at": "2026-11-26T08:00:00-03:00",
+      "end_at": "2026-11-26T09:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 8,
+      "user_id": 6
+    },
+    {
+      "id": 26,
+      "start_at": "2026-11-26T11:00:00-03:00",
+      "end_at": "2026-11-26T12:00:00-03:00",
+      "status": "cancelled",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": "2026-11-21T13:00:00-03:00",
+      "space_id": 9,
+      "user_id": 6
+    },
+    {
+      "id": 27,
+      "start_at": "2026-11-26T11:00:00-03:00",
+      "end_at": "2026-11-26T12:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 3,
+      "user_id": 4
+    },
+    {
+      "id": 28,
+      "start_at": "2026-11-26T14:00:00-03:00",
+      "end_at": "2026-11-26T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 9,
+      "user_id": 6
+    },
+    {
+      "id": 29,
+      "start_at": "2026-11-26T15:00:00-03:00",
+      "end_at": "2026-11-26T17:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 9,
+      "user_id": 5
+    },
+    {
+      "id": 30,
+      "start_at": "2026-11-26T19:00:00-03:00",
+      "end_at": "2026-11-26T20:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 3,
+      "user_id": 5
+    },
+    {
+      "id": 31,
+      "start_at": "2026-11-30T08:00:00-03:00",
+      "end_at": "2026-11-30T10:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space_id": 3,
+      "user_id": 6
+    },
+    {
+      "id": 32,
+      "start_at": "2026-11-30T19:00:00-03:00",
+      "end_at": "2026-11-30T20:00:00-03:00",
+      "status": "cancelled",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": "2026-11-21T13:00:00-03:00",
+      "space_id": 9,
+      "user_id": 4
+    }
+  ]
+}

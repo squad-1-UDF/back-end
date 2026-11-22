@@ -28,6 +28,9 @@ if database["ENGINE"] == "django.db.backends.postgresql":
     ):
         raise RuntimeError("UC003 HTTP exige PostgreSQL local ou efêmero da CI.")
 
+# Valores padrão dos campos descritivos (spaces.0003_campos).
+DEFAULTS = {"name": "", "capacity": None, "location": "", "is_active": True}
+
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.skipif(
@@ -108,7 +111,7 @@ def test_regular_user_can_read_but_cannot_write(regular_client):
     space = Space.objects.create(code="SALA-01", kind="room")
     detail_url = reverse("spaces-detail", kwargs={"space_id": space.pk})
     assert regular_client.get(reverse("spaces-list")).json() == [
-        {"id": space.pk, "code": "SALA-01", "kind": "room"}
+        {"id": space.pk, "code": "SALA-01", "kind": "room", **DEFAULTS}
     ]
     assert regular_client.get(detail_url).json()["id"] == space.pk
 
@@ -141,6 +144,7 @@ def test_empty_list_create_and_read_in_later_request(logged_in_client):
         "id": laboratory.json()["id"],
         "code": "LAB-02",
         "kind": "laboratory",
+        **DEFAULTS,
     }
     assert room.json()["code"] == "SALA-01"
     assert isinstance(laboratory.json()["id"], int)
@@ -159,7 +163,12 @@ def test_patch_is_partial_and_persists(logged_in_client):
     url = reverse("spaces-detail", kwargs={"space_id": space.pk})
     response = request_json(logged_in_client, "patch", url, {"code": " SALA-02 "})
     assert response.status_code == 200
-    assert response.json() == {"id": space.pk, "code": "SALA-02", "kind": "room"}
+    assert response.json() == {
+        "id": space.pk,
+        "code": "SALA-02",
+        "kind": "room",
+        **DEFAULTS,
+    }
     assert logged_in_client.get(url).json() == response.json()
     space.refresh_from_db()
     assert (space.code, space.kind) == ("SALA-02", "room")
@@ -299,3 +308,110 @@ def test_post_and_patch_require_csrf_with_real_session(logged_in_client):
     response = request_json(client, "patch", detail_url, {"kind": "laboratory"})
     assert response.status_code == 200
     assert Space.objects.get(pk=response.json()["id"]).kind == "laboratory"
+
+
+def test_new_fields_are_created_patched_and_read(logged_in_client, regular_client):
+    list_url = reverse("spaces-list")
+    created = request_json(
+        logged_in_client,
+        "post",
+        list_url,
+        {
+            "code": "LAB-10",
+            "kind": "laboratory",
+            "name": "  Laboratório de Redes ",
+            "capacity": 30,
+            "location": "Bloco B, 2º andar",
+        },
+    )
+    assert created.status_code == 201
+    space_id = created.json()["id"]
+    assert created.json() == {
+        "id": space_id,
+        "code": "LAB-10",
+        "kind": "laboratory",
+        "name": "Laboratório de Redes",
+        "capacity": 30,
+        "location": "Bloco B, 2º andar",
+        "is_active": True,
+    }
+    url = reverse("spaces-detail", kwargs={"space_id": space_id})
+    patched = request_json(
+        logged_in_client,
+        "patch",
+        url,
+        {"capacity": None, "is_active": False, "name": ""},
+    )
+    assert patched.status_code == 200
+    assert patched.json() == {
+        **created.json(),
+        "capacity": None,
+        "is_active": False,
+        "name": "",
+    }
+    space = Space.objects.get(pk=space_id)
+    assert (space.capacity, space.is_active, space.name) == (None, False, "")
+    assert regular_client.get(url).json() == patched.json()
+    response = request_json(regular_client, "patch", url, {"is_active": True})
+    assert response.status_code == 403
+    assert Space.objects.get(pk=space_id).is_active is False
+
+
+def test_list_filters_by_is_active_and_kind(regular_client):
+    lab = Space.objects.create(code="LAB-01", kind="laboratory")
+    room = Space.objects.create(code="SALA-01", kind="room")
+    old_room = Space.objects.create(code="SALA-02", kind="room", is_active=False)
+
+    def ids(query):
+        response = regular_client.get(reverse("spaces-list") + query)
+        assert response.status_code == 200
+        return [item["id"] for item in response.json()]
+
+    assert ids("") == [lab.pk, room.pk, old_room.pk]
+    assert ids("?is_active=true") == [lab.pk, room.pk]
+    assert ids("?is_active=false") == [old_room.pk]
+    assert ids("?kind=room") == [room.pk, old_room.pk]
+    assert ids("?kind=room&is_active=true") == [room.pk]
+
+
+@pytest.mark.parametrize(
+    "query", ["?is_active=1", "?kind=other", "?kind=room&kind=laboratory", "?x=1"]
+)
+def test_invalid_list_filters_return_400(regular_client, query):
+    response = regular_client.get(reverse("spaces-list") + query)
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "INVALID_REQUEST"
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"capacity": 0},
+        {"capacity": -1},
+        {"capacity": "10"},
+        {"capacity": True},
+        {"capacity": 1.5},
+        {"is_active": "false"},
+        {"is_active": 0},
+        {"name": "A" * 121},
+        {"location": "A" * 121},
+    ],
+)
+def test_invalid_new_fields_return_400(logged_in_client, payload):
+    response = request_json(
+        logged_in_client,
+        "post",
+        reverse("spaces-list"),
+        {"code": "LAB-01", "kind": "laboratory", **payload},
+    )
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "INVALID_REQUEST"
+    assert Space.objects.count() == 0
+
+
+def test_database_rejects_non_positive_capacity():
+    with pytest.raises(IntegrityError) as error, transaction.atomic():
+        Space.objects.create(code="LAB-01", kind="room", capacity=0)
+    assert (
+        error.value.__cause__.diag.constraint_name == "spaces_space_capacity_positive"
+    )

@@ -2,18 +2,60 @@
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import connection, models, transaction
 from django.db.models import F, Q
+from django.db.models.functions import Trim, Upper
 
 
 class Key(models.Model):
+    class Status(models.TextChoices):
+        AVAILABLE = "available", "Disponível"
+        MAINTENANCE = "maintenance", "Em manutenção"
+        LOST = "lost", "Perdida"
+        INACTIVE = "inactive", "Inativa"
+
     id = models.BigAutoField(primary_key=True)
     space = models.ForeignKey(
         "spaces.Space", on_delete=models.PROTECT, related_name="keys"
     )
+    # Rótulo físico da chave; único sem diferenciar maiúsculas nem espaços nas pontas.
+    label = models.CharField(max_length=40)
+    status = models.CharField(
+        max_length=12,
+        choices=Status.choices,
+        default=Status.AVAILABLE,
+        db_default=Status.AVAILABLE,
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                Upper(Trim("label")), name="keys_key_label_unique_ci"
+            ),
+            models.CheckConstraint(
+                condition=Q(label__regex=r"[^[:space:]]"),
+                name="keys_key_label_nonblank",
+            ),
+            models.CheckConstraint(
+                condition=Q(
+                    status__in=["available", "maintenance", "lost", "inactive"]
+                ),
+                name="keys_key_status_valid",
+            ),
+        ]
 
     def save(self, *args, **kwargs):
-        if self.pk:
+        if self.pk is None and not (self.label or "").strip():
+            # Chaves criadas sem rótulo (scripts e testes antigos) recebem o
+            # mesmo padrão da migration: CHAVE-<id>. A API sempre exige label.
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT nextval(pg_get_serial_sequence('keys_key', 'id'))"
+                )
+                self.pk = cursor.fetchone()[0]
+            self.label = f"CHAVE-{self.pk}"
+            kwargs["force_insert"] = True
+        if self.pk and not kwargs.get("force_insert"):
             with transaction.atomic():
                 previous = type(self).objects.select_for_update().get(pk=self.pk)
                 if (

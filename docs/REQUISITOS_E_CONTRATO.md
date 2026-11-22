@@ -25,14 +25,14 @@ Telas: login, dashboard, lista e detalhe de salas, agenda/disponibilidade, nova 
 | Área | Exemplo de endpoint | Ação esperada |
 |---|---|---|
 | Autenticação | `GET /auth/csrf/`, `POST /auth/login/`, `POST /auth/logout/`, `GET /auth/me/` | Camada HTTP com sessões Django e cookie CSRF; `auth.User` nativo adotado provisoriamente, com PostgreSQL local e testes de integração separados |
-| Usuários | `/users/` | Operações restritas por papel |
+| Usuários | `/users/` e `/users/{user_id}/` | Implementado (UC002): listar e consultar exigem papel `employee` ou `admin`; cadastrar e atualizar exigem `admin` e CSRF; sem `DELETE` (desativação por `is_active`). Papel derivado de `auth.User` (`is_superuser`/grupo `admin` → `admin`, `is_staff` → `employee`, demais → `student`); detalhes em `GUIA_FRONTEND_MVP.md` |
 | Salas | `/spaces/` e `/spaces/{space_id}/` | Listar e consultar com sessão autenticada; cadastrar e atualizar parcialmente no PostgreSQL exigem provisoriamente `is_staff=True` e CSRF |
 | Chaves | `/keys/` | Manter e consultar disponibilidade |
 | Retiradas | `/key-loans/` | Entregar/devolver com registro auditável |
 | Reservas | `/bookings/` | Reservar, listar e cancelar |
 | Agenda | `/availability/` | Verificar horários sem conflitos |
 
-Fora de UC001 e UC003, endpoints, nomes e campos são **propostas**, não contratos aprovados. Em UC001, `identifier`/`password`, sessões e respostas são provisórios. Em UC003, `id` é inteiro, `code` é único e `kind` aceita `room` ou `laboratory`; POST/PATCH exigem provisoriamente `is_staff=True`, enquanto a aprovação institucional final dessa política permanece pendente. As operações de reserva devem validar conflitos em transação no banco, depois que o esquema for acordado.
+Fora de UC001, UC002 e UC003, endpoints, nomes e campos são **propostas**, não contratos aprovados. Em UC001, `identifier`/`password`, sessões e respostas são provisórios. Em UC003, `id` é inteiro, `code` é único e `kind` aceita `room` ou `laboratory`; POST/PATCH exigem provisoriamente `is_staff=True`, enquanto a aprovação institucional final dessa política permanece pendente. As operações de reserva devem validar conflitos em transação no banco, depois que o esquema for acordado.
 
 ## Alinhamento necessário com responsável pelo banco
 
@@ -43,4 +43,4 @@ Fora de UC001 e UC003, endpoints, nomes e campos são **propostas**, não contra
 - Convenções de timestamps e timezone.
 - Estratégia de ambientes (development/test) e criação de bancos de teste.
 
-O model mínimo `Space` de UC003 e suas quatro rotas HTTP usam PostgreSQL. Os demais models de negócio ainda dependem do contrato de dados.
+O model mínimo `Space` de UC003 e suas quatro rotas HTTP usam PostgreSQL. `Key`, `KeyLoan`, `KeyMovement` (`keys.0001_initial`) e `Booking` (`bookings.0001_initial`) também já têm migrations na `main`, com regras no banco reforçadas pelas migrations `0002_integridade` de `spaces`, `keys` e `bookings`; seus contratos HTTP seguem provisórios e em desenvolvimento. A modelagem, o dicionário de dados e a revisão de integridade do squad de dados estão em `docs/dados/`.

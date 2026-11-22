@@ -130,3 +130,6 @@ jobs:
           apps/tests/test_key_loans_api_postgres.py
           apps/tests/test_bookings_postgres.py
           apps/tests/test_mvp_integration_postgres.py
+          apps/tests/test_keys_api_postgres.py
+          apps/tests/test_users_api_postgres.py
+          apps/tests/test_integridade_postgres.py

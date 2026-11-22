@@ -1,4 +1,4 @@
-"""Camada HTTP provisória de UC001, sem definir o modelo de identidade."""
+"""Camada HTTP de UC001 (sessão) e do perfil da sessão atual."""
 
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.http import HttpResponse, JsonResponse
@@ -12,6 +12,8 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from apps.accounts.serializers import MeResponse
 
 
 class LoginPayload(serializers.Serializer):
@@ -101,4 +103,4 @@ class MeView(APIView):
     http_method_names = ("get", "options")
 
     def get(self, request):
-        return Response({"id": request.user.pk})
+        return Response(MeResponse(request.user).data)
