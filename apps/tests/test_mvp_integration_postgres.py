@@ -54,7 +54,8 @@ def login_client(user):
     assert response.json() == {"user": {"id": user.pk}}
     session = Session.objects.get(session_key=client.cookies["sessionid"].value)
     assert session.get_decoded()["_auth_user_id"] == str(user.pk)
-    assert client.get(reverse("auth-me")).json() == {
+    me = client.get(reverse("auth-me")).json()
+    assert {key: me[key] for key in ("id", "is_staff")} == {
         "id": user.pk,
         "is_staff": user.is_staff,
     }
@@ -111,6 +112,10 @@ def test_mvp_end_to_end_with_real_sessions_and_csrf():
         "id": space_id,
         "code": "LAB-MVP",
         "kind": "laboratory",
+        "name": "",
+        "capacity": None,
+        "location": "",
+        "is_active": True,
     }
     assert Space.objects.get(pk=space_id).code == "LAB-MVP"
     space_detail_url = reverse("spaces-detail", args=[space_id])
@@ -200,9 +205,17 @@ def test_mvp_end_to_end_with_real_sessions_and_csrf():
     assert regular.get(availability_url).json()["available"] is True
     assert regular.get(agenda_url).json()["occupied"] == []
 
-    # UC004 ainda não possui endpoint integrado: fixture ORM somente para a chave.
-    key = Key.objects.create(space_id=space_id)
-    assert key.space_id == space_id
+    keys_url = reverse("keys-list")
+    key_payload = {"space_id": space_id, "label": "LAB-MVP-01"}
+    error_code(write_json(regular, "post", keys_url, key_payload), 403, "FORBIDDEN")
+    created_key = write_json(staff, "post", keys_url, key_payload)
+    assert created_key.status_code == 201
+    key = Key.objects.get(pk=created_key.json()["id"])
+    assert (key.space_id, key.label, key.status) == (
+        space_id,
+        "LAB-MVP-01",
+        "available",
+    )
     checkout_url = reverse("key-loans-checkout")
     checkout_payload = {"key_id": key.pk, "responsible_user_id": regular_user.pk}
     error_code(
@@ -215,8 +228,15 @@ def test_mvp_end_to_end_with_real_sessions_and_csrf():
     assert set(loan) == {
         "id",
         "key_id",
+        "key_label",
+        "space_id",
+        "space_code",
         "responsible_user_id",
+        "responsible_name",
+        "checkout_operator_id",
         "checked_out_at",
+        "returned_at",
+        "return_operator_id",
         "status",
     }
     assert (loan["key_id"], loan["responsible_user_id"], loan["status"]) == (
@@ -270,6 +290,8 @@ def test_integrated_routes_resolve_without_collisions():
         "auth-login": (),
         "auth-logout": (),
         "auth-me": (),
+        "users-list": (),
+        "users-detail": (1,),
         "spaces-list": (),
         "spaces-detail": (1,),
         "bookings-list": (),

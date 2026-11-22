@@ -1,6 +1,7 @@
 """UC004–UC008 com usuários reais e PostgreSQL de teste isolado."""
 
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from importlib import import_module
 from threading import Barrier
@@ -42,6 +43,36 @@ pytestmark = [
 ]
 
 AT = datetime(2026, 10, 30, 10, tzinfo=UTC)
+
+# Triggers de keys/0002_integridade (P1-P5). Os testes abaixo simulam dados
+# legados, gravados antes da migration, para provar que a camada Python também
+# recusa histórico inconsistente.
+INTEGRITY_TRIGGERS = (
+    ("keys_keyloan", "keys_loan_guard_update"),
+    ("keys_keyloan", "keys_loan_requires_movements"),
+    ("keys_keyloan", "keys_loan_not_in_future"),
+    ("keys_keyloan", "keys_loan_responsible_active"),
+    ("keys_keymovement", "keys_movement_matches_loan"),
+)
+
+
+def _toggle_integrity_triggers(action):
+    with connection.cursor() as cursor:
+        # ALTER TABLE exige que não haja eventos adiados pendentes (FKs).
+        cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+        for table, trigger in INTEGRITY_TRIGGERS:
+            cursor.execute(f"ALTER TABLE {table} {action} TRIGGER {trigger}")
+        cursor.execute("SET CONSTRAINTS ALL DEFERRED")
+
+
+@contextmanager
+def legacy_data_without_integrity_triggers():
+    """Desliga P1-P5 só dentro da transação do teste (o DDL é revertido)."""
+    _toggle_integrity_triggers("DISABLE")
+    try:
+        yield
+    finally:
+        _toggle_integrity_triggers("ENABLE")
 
 
 @pytest.fixture
@@ -162,26 +193,29 @@ def test_postgresql_rejects_orphan_foreign_keys(domain):
 
 def test_services_reject_inconsistent_existing_movements(domain):
     key, responsible, operator = domain
-    loan = checkout_key(
-        key_id=key.pk, responsible=responsible, operator=operator, occurred_at=AT
-    )
-    KeyLoan.objects.filter(pk=loan.pk).update(checkout_operator=responsible)
-    with pytest.raises(ValueError, match="inconsistente"):
+    with legacy_data_without_integrity_triggers():
+        loan = checkout_key(
+            key_id=key.pk, responsible=responsible, operator=operator, occurred_at=AT
+        )
+        KeyLoan.objects.filter(pk=loan.pk).update(checkout_operator=responsible)
+        with pytest.raises(ValueError, match="inconsistente"):
+            return_key(
+                loan_id=loan.pk, operator=operator, occurred_at=AT + timedelta(hours=1)
+            )
+        assert KeyLoan.objects.get(pk=loan.pk).returned_at is None
+        KeyLoan.objects.filter(pk=loan.pk).update(checkout_operator=operator)
         return_key(
             loan_id=loan.pk, operator=operator, occurred_at=AT + timedelta(hours=1)
         )
-    assert KeyLoan.objects.get(pk=loan.pk).returned_at is None
-    KeyLoan.objects.filter(pk=loan.pk).update(checkout_operator=operator)
-    return_key(loan_id=loan.pk, operator=operator, occurred_at=AT + timedelta(hours=1))
-    KeyLoan.objects.filter(pk=loan.pk).update(returned_at=AT)
-    with pytest.raises(ValueError, match="inconsistente"):
-        checkout_key(
-            key_id=key.pk,
-            responsible=responsible,
-            operator=operator,
-            occurred_at=AT + timedelta(hours=2),
-        )
-    assert KeyLoan.objects.count() == 1
+        KeyLoan.objects.filter(pk=loan.pk).update(returned_at=AT)
+        with pytest.raises(ValueError, match="inconsistente"):
+            checkout_key(
+                key_id=key.pk,
+                responsible=responsible,
+                operator=operator,
+                occurred_at=AT + timedelta(hours=2),
+            )
+        assert KeyLoan.objects.count() == 1
 
 
 @pytest.mark.parametrize("kind", ["checkout", "return"])
@@ -229,32 +263,33 @@ def test_history_rejects_loans_without_expected_movements(
     domain, returned, movement_kinds
 ):
     key, responsible, operator = domain
-    loan = KeyLoan.objects.create(
-        key=key,
-        responsible=responsible,
-        checkout_operator=operator,
-        checked_out_at=AT,
-        returned_at=AT + timedelta(hours=1) if returned else None,
-        return_operator=operator if returned else None,
-    )
-    for kind in movement_kinds:
-        KeyMovement.objects.create(
-            loan=loan,
-            kind=kind,
-            occurred_at=AT if kind == "checkout" else AT + timedelta(hours=1),
-            operator=operator,
-        )
-
-    with pytest.raises(ValueError, match="sem movimentação esperada"):
-        _rule_history(key)
-    with pytest.raises(ValueError, match="sem movimentação esperada"):
-        checkout_key(
-            key_id=key.pk,
+    with legacy_data_without_integrity_triggers():
+        loan = KeyLoan.objects.create(
+            key=key,
             responsible=responsible,
-            operator=operator,
-            occurred_at=AT + timedelta(hours=2),
+            checkout_operator=operator,
+            checked_out_at=AT,
+            returned_at=AT + timedelta(hours=1) if returned else None,
+            return_operator=operator if returned else None,
         )
-    assert KeyLoan.objects.count() == 1
+        for kind in movement_kinds:
+            KeyMovement.objects.create(
+                loan=loan,
+                kind=kind,
+                occurred_at=AT if kind == "checkout" else AT + timedelta(hours=1),
+                operator=operator,
+            )
+
+        with pytest.raises(ValueError, match="sem movimentação esperada"):
+            _rule_history(key)
+        with pytest.raises(ValueError, match="sem movimentação esperada"):
+            checkout_key(
+                key_id=key.pk,
+                responsible=responsible,
+                operator=operator,
+                occurred_at=AT + timedelta(hours=2),
+            )
+        assert KeyLoan.objects.count() == 1
 
 
 @pytest.mark.django_db(transaction=True)

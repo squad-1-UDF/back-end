@@ -14,14 +14,16 @@ from rest_framework.views import APIView
 
 from apps.keys.loan_serializers import (
     CheckoutPayload,
-    CheckoutResponse,
+    LoanFilters,
+    LoanOut,
     MovementResponse,
-    ReturnResponse,
 )
 from apps.keys.models import Key, KeyLoan
 from apps.keys.services import (
+    KeyNotAvailable,
     checkout_key,
     has_active_loan,
+    loans_with_relations,
     movements_for_key,
     return_key,
 )
@@ -63,8 +65,26 @@ class LoanAPIView(APIView):
 
 @method_decorator(csrf_protect, name="dispatch")
 class CheckoutView(LoanAPIView):
+    """GET lista empréstimos; POST registra retirada. Ambos exigem staff."""
+
     permission_classes = (IsAuthenticated, IsAdminUser)
-    http_method_names = ("post", "options")
+    http_method_names = ("get", "post", "options")
+
+    def get(self, request):
+        filters = LoanFilters(data=request.query_params)
+        filters.is_valid(raise_exception=True)
+        values = filters.validated_data
+        loans = loans_with_relations()
+        if "status" in values:
+            loans = loans.filter(returned_at__isnull=values["status"] == "active")
+        if "key_id" in values:
+            loans = loans.filter(key_id=values["key_id"])
+        if "space_id" in values:
+            loans = loans.filter(key__space_id=values["space_id"])
+        if "responsible_user_id" in values:
+            loans = loans.filter(responsible_id=values["responsible_user_id"])
+        page = loans[values["offset"] : values["offset"] + values["limit"]]
+        return Response(LoanOut(page, many=True).data)
 
     def post(self, request):
         payload = CheckoutPayload(data=request.data)
@@ -77,6 +97,12 @@ class CheckoutView(LoanAPIView):
         try:
             loan = checkout_key(
                 key_id=key_id, responsible=responsible, operator=request.user
+            )
+        except KeyNotAvailable as exc:
+            return conflict(
+                "KEY_UNAVAILABLE",
+                "Chave fora de uso para retirada.",
+                details={"key_id": key_id, "status": exc.status},
             )
         except IntegrityError as exc:
             if not is_active_loan_constraint(exc):
@@ -94,7 +120,10 @@ class CheckoutView(LoanAPIView):
                 "Chave com empréstimo ativo.",
                 details={"key_id": key_id},
             )
-        return Response(CheckoutResponse(loan).data, status=status.HTTP_201_CREATED)
+        return Response(
+            LoanOut(loans_with_relations().get(pk=loan.pk)).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 @method_decorator(csrf_protect, name="dispatch")
@@ -113,7 +142,7 @@ class ReturnView(LoanAPIView):
             if str(exc) != "Empréstimo inexistente ou já encerrado.":
                 raise
             return conflict("LOAN_ALREADY_RETURNED", "Empréstimo já encerrado.")
-        return Response(ReturnResponse(loan).data)
+        return Response(LoanOut(loans_with_relations().get(pk=loan.pk)).data)
 
 
 class LoanAvailabilityView(LoanAPIView):

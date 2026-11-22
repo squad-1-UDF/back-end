@@ -2,6 +2,8 @@ from django.http import HttpResponseNotAllowed, JsonResponse
 from django.urls import include, path
 
 from apps.accounts.api import LoginView, LogoutView, MeView, csrf_cookie
+from apps.accounts.users_api import UserDetailView, UserListCreateView
+from apps.keys.api import KeyDetailView, KeyListCreateView
 from apps.spaces.api import SpaceDetailView, SpaceListCreateView
 
 
@@ -18,10 +20,14 @@ urlpatterns = [
     path("api/v1/auth/login/", LoginView.as_view(), name="auth-login"),
     path("api/v1/auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("api/v1/auth/me/", MeView.as_view(), name="auth-me"),
+    path("api/v1/users/", UserListCreateView.as_view(), name="users-list"),
+    path("api/v1/users/<int:user_id>/", UserDetailView.as_view(), name="users-detail"),
     path("api/v1/spaces/", SpaceListCreateView.as_view(), name="spaces-list"),
     path(
         "api/v1/spaces/<int:space_id>/", SpaceDetailView.as_view(), name="spaces-detail"
     ),
+    path("api/v1/keys/", KeyListCreateView.as_view(), name="keys-list"),
+    path("api/v1/keys/<int:key_id>/", KeyDetailView.as_view(), name="keys-detail"),
     path("api/v1/", include("apps.keys.loan_urls")),
     path("api/v1/", include("apps.bookings.urls")),
 ]

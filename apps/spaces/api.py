@@ -14,13 +14,19 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.spaces.models import Space
-from apps.spaces.serializers import SpaceSerializer
+from apps.spaces.serializers import SpaceFilters, SpaceSerializer
+
+# spaces_space_code_key: unicidade exata (0001); spaces_space_code_normalized_uniq:
+# sem diferenciar maiúsculas nem espaços nas pontas (0002_integridade, P7).
+DUPLICATE_CODE_CONSTRAINTS = frozenset(
+    {"spaces_space_code_key", "spaces_space_code_normalized_uniq"}
+)
 
 
 def is_duplicate_code(error):
     cause = error.__cause__
     return isinstance(cause, UniqueViolation) and (
-        cause.diag.constraint_name == "spaces_space_code_key"
+        cause.diag.constraint_name in DUPLICATE_CODE_CONSTRAINTS
     )
 
 
@@ -76,7 +82,14 @@ class SpaceListCreateView(SpaceAPIView):
     http_method_names: ClassVar = ("get", "post", "options")
 
     def get(self, request):
+        filters = SpaceFilters(data=request.query_params)
+        filters.is_valid(raise_exception=True)
+        values = filters.validated_data
         spaces = Space.objects.order_by("id")
+        if "is_active" in values:
+            spaces = spaces.filter(is_active=values["is_active"] == "true")
+        if "kind" in values:
+            spaces = spaces.filter(kind=values["kind"])
         return Response(SpaceSerializer(spaces, many=True).data)
 
     def post(self, request):

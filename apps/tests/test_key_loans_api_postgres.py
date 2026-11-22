@@ -36,6 +36,20 @@ pytestmark = [
 ]
 
 AT = datetime(2026, 10, 30, 10, tzinfo=UTC)
+LOAN_FIELDS = {
+    "id",
+    "key_id",
+    "key_label",
+    "space_id",
+    "space_code",
+    "responsible_user_id",
+    "responsible_name",
+    "checkout_operator_id",
+    "checked_out_at",
+    "returned_at",
+    "return_operator_id",
+    "status",
+}
 
 
 @pytest.fixture
@@ -105,13 +119,10 @@ def test_checkout_return_availability_and_history(actors):
     after = timezone.now()
     assert checkout.status_code == 201
     data = checkout.json()
-    assert set(data) == {
-        "id",
-        "key_id",
-        "responsible_user_id",
-        "checked_out_at",
-        "status",
-    }
+    assert set(data) == LOAN_FIELDS
+    assert (data["returned_at"], data["return_operator_id"]) == (None, None)
+    assert data["checkout_operator_id"] == staff.pk
+    assert (data["key_label"], data["space_code"]) == (key.label, "SALA-API")
     assert (data["key_id"], data["responsible_user_id"], data["status"]) == (
         key.pk,
         responsible.pk,
@@ -148,6 +159,9 @@ def test_checkout_return_availability_and_history(actors):
     assert returned.status_code == 200
     assert returned.json()["id"] == loan.pk
     assert returned.json()["status"] == "returned"
+    assert set(returned.json()) == LOAN_FIELDS
+    assert returned.json()["return_operator_id"] == staff.pk
+    assert returned.json()["checked_out_at"] == data["checked_out_at"]
     returned_at = datetime.fromisoformat(returned.json()["returned_at"])
     assert before_return <= returned_at <= after_return
     loan.refresh_from_db()
