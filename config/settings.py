@@ -67,6 +67,23 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
+# Hospedagem: DATABASE_URL (postgresql://usuario:senha@host:porta/banco?sslmode=...)
+# preenche as variáveis DB_* que ainda não estiverem definidas.
+if os.getenv("DATABASE_URL"):
+    from urllib.parse import parse_qs, unquote, urlparse
+
+    _url = urlparse(os.environ["DATABASE_URL"])
+    _query = parse_qs(_url.query)
+    for _nome, _valor in {
+        "DB_NAME": _url.path.lstrip("/"),
+        "DB_USER": unquote(_url.username or ""),
+        "DB_PASSWORD": unquote(_url.password or ""),
+        "DB_HOST": _url.hostname or "",
+        "DB_PORT": str(_url.port or 5432),
+        "DB_SSLMODE": _query.get("sslmode", ["prefer"])[0],
+    }.items():
+        os.environ.setdefault(_nome, _valor)
+
 # DB_DISABLED permite testes sem banco mesmo quando existe um .env local.
 # DB_NAME vazio também mantém os testes de regras puras sem SQLite implícito.
 # Com DB_NAME, o banco vem inteiramente do ambiente (local ou produção).
