@@ -1,0 +1,1959 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "operador.1",
+      "first_name": "Operador",
+      "last_name": "Teste 1",
+      "email": "operador.1@exemplo.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "operador.2",
+      "first_name": "Operador",
+      "last_name": "Teste 2",
+      "email": "operador.2@exemplo.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "coordenacao",
+      "first_name": "Coordenação",
+      "last_name": "Teste",
+      "email": "coordenacao@exemplo.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "professor.1",
+      "first_name": "Professor",
+      "last_name": "Teste 1",
+      "email": "professor.1@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 5,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "professor.2",
+      "first_name": "Professor",
+      "last_name": "Teste 2",
+      "email": "professor.2@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 6,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "professor.3",
+      "first_name": "Professor",
+      "last_name": "Teste 3",
+      "email": "professor.3@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 7,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "professor.4",
+      "first_name": "Professor",
+      "last_name": "Teste 4",
+      "email": "professor.4@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 8,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.1",
+      "first_name": "Aluno",
+      "last_name": "Teste 1",
+      "email": "aluno.1@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 9,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.2",
+      "first_name": "Aluno",
+      "last_name": "Teste 2",
+      "email": "aluno.2@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 10,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.3",
+      "first_name": "Aluno",
+      "last_name": "Teste 3",
+      "email": "aluno.3@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 11,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.4",
+      "first_name": "Aluno",
+      "last_name": "Teste 4",
+      "email": "aluno.4@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 12,
+    "fields": {
+      "password": "!demo-sem-login",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "aluno.5",
+      "first_name": "Aluno",
+      "last_name": "Teste 5",
+      "email": "aluno.5@exemplo.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-11-01T08:00:00-03:00",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 1,
+    "fields": {
+      "code": "LAB-01",
+      "kind": "laboratory"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 2,
+    "fields": {
+      "code": "LAB-02",
+      "kind": "laboratory"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 3,
+    "fields": {
+      "code": "LAB-03",
+      "kind": "laboratory"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 4,
+    "fields": {
+      "code": "LAB-REDES",
+      "kind": "laboratory"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 5,
+    "fields": {
+      "code": "SALA-101",
+      "kind": "room"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 6,
+    "fields": {
+      "code": "SALA-102",
+      "kind": "room"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 7,
+    "fields": {
+      "code": "SALA-201",
+      "kind": "room"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 8,
+    "fields": {
+      "code": "SALA-202",
+      "kind": "room"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 9,
+    "fields": {
+      "code": "AUDITORIO",
+      "kind": "room"
+    }
+  },
+  {
+    "model": "spaces.space",
+    "pk": 10,
+    "fields": {
+      "code": "SALA-REUNIAO",
+      "kind": "room"
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 1,
+    "fields": {
+      "space": 1
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 2,
+    "fields": {
+      "space": 1
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 3,
+    "fields": {
+      "space": 2
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 4,
+    "fields": {
+      "space": 2
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 5,
+    "fields": {
+      "space": 3
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 6,
+    "fields": {
+      "space": 3
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 7,
+    "fields": {
+      "space": 4
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 8,
+    "fields": {
+      "space": 4
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 9,
+    "fields": {
+      "space": 5
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 10,
+    "fields": {
+      "space": 6
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 11,
+    "fields": {
+      "space": 7
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 12,
+    "fields": {
+      "space": 8
+    }
+  },
+  {
+    "model": "keys.key",
+    "pk": 13,
+    "fields": {
+      "space": 9
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 1,
+    "fields": {
+      "checked_out_at": "2026-11-03T08:00:00-03:00",
+      "returned_at": "2026-11-03T09:50:00-03:00",
+      "checkout_operator": 3,
+      "key": 8,
+      "responsible": 5,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 2,
+    "fields": {
+      "checked_out_at": "2026-11-03T09:30:00-03:00",
+      "returned_at": "2026-11-03T11:20:00-03:00",
+      "checkout_operator": 3,
+      "key": 1,
+      "responsible": 9,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 3,
+    "fields": {
+      "checked_out_at": "2026-11-03T10:05:00-03:00",
+      "returned_at": "2026-11-03T10:55:00-03:00",
+      "checkout_operator": 3,
+      "key": 13,
+      "responsible": 5,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 4,
+    "fields": {
+      "checked_out_at": "2026-11-04T08:10:00-03:00",
+      "returned_at": "2026-11-04T09:00:00-03:00",
+      "checkout_operator": 2,
+      "key": 10,
+      "responsible": 11,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 5,
+    "fields": {
+      "checked_out_at": "2026-11-04T18:30:00-03:00",
+      "returned_at": "2026-11-04T20:10:00-03:00",
+      "checkout_operator": 2,
+      "key": 13,
+      "responsible": 10,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 6,
+    "fields": {
+      "checked_out_at": "2026-11-09T08:05:00-03:00",
+      "returned_at": "2026-11-09T09:35:00-03:00",
+      "checkout_operator": 1,
+      "key": 13,
+      "responsible": 11,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 7,
+    "fields": {
+      "checked_out_at": "2026-11-09T18:20:00-03:00",
+      "returned_at": "2026-11-09T21:20:00-03:00",
+      "checkout_operator": 2,
+      "key": 4,
+      "responsible": 12,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 8,
+    "fields": {
+      "checked_out_at": "2026-11-10T10:20:00-03:00",
+      "returned_at": "2026-11-10T12:00:00-03:00",
+      "checkout_operator": 2,
+      "key": 11,
+      "responsible": 10,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 9,
+    "fields": {
+      "checked_out_at": "2026-11-10T19:30:00-03:00",
+      "returned_at": "2026-11-10T23:10:00-03:00",
+      "checkout_operator": 1,
+      "key": 2,
+      "responsible": 12,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 10,
+    "fields": {
+      "checked_out_at": "2026-11-11T14:30:00-03:00",
+      "returned_at": "2026-11-11T15:20:00-03:00",
+      "checkout_operator": 3,
+      "key": 13,
+      "responsible": 7,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 11,
+    "fields": {
+      "checked_out_at": "2026-11-11T19:30:00-03:00",
+      "returned_at": "2026-11-11T21:20:00-03:00",
+      "checkout_operator": 2,
+      "key": 2,
+      "responsible": 8,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 12,
+    "fields": {
+      "checked_out_at": "2026-11-12T09:30:00-03:00",
+      "returned_at": "2026-11-12T11:10:00-03:00",
+      "checkout_operator": 1,
+      "key": 5,
+      "responsible": 9,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 13,
+    "fields": {
+      "checked_out_at": "2026-11-12T15:00:00-03:00",
+      "returned_at": "2026-11-12T16:50:00-03:00",
+      "checkout_operator": 3,
+      "key": 6,
+      "responsible": 11,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 14,
+    "fields": {
+      "checked_out_at": "2026-11-13T08:10:00-03:00",
+      "returned_at": "2026-11-13T09:00:00-03:00",
+      "checkout_operator": 3,
+      "key": 12,
+      "responsible": 8,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 15,
+    "fields": {
+      "checked_out_at": "2026-11-16T10:00:00-03:00",
+      "returned_at": "2026-11-16T13:00:00-03:00",
+      "checkout_operator": 2,
+      "key": 8,
+      "responsible": 7,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 16,
+    "fields": {
+      "checked_out_at": "2026-11-16T15:20:00-03:00",
+      "returned_at": "2026-11-16T16:50:00-03:00",
+      "checkout_operator": 2,
+      "key": 12,
+      "responsible": 5,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 17,
+    "fields": {
+      "checked_out_at": "2026-11-17T09:20:00-03:00",
+      "returned_at": "2026-11-17T11:00:00-03:00",
+      "checkout_operator": 2,
+      "key": 3,
+      "responsible": 10,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 18,
+    "fields": {
+      "checked_out_at": "2026-11-17T13:05:00-03:00",
+      "returned_at": "2026-11-17T14:35:00-03:00",
+      "checkout_operator": 3,
+      "key": 13,
+      "responsible": 6,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 19,
+    "fields": {
+      "checked_out_at": "2026-11-17T13:20:00-03:00",
+      "returned_at": "2026-11-17T15:00:00-03:00",
+      "checkout_operator": 1,
+      "key": 6,
+      "responsible": 11,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 20,
+    "fields": {
+      "checked_out_at": "2026-11-17T14:05:00-03:00",
+      "returned_at": "2026-11-17T14:55:00-03:00",
+      "checkout_operator": 2,
+      "key": 5,
+      "responsible": 11,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 21,
+    "fields": {
+      "checked_out_at": "2026-11-17T14:30:00-03:00",
+      "returned_at": "2026-11-17T18:10:00-03:00",
+      "checkout_operator": 2,
+      "key": 2,
+      "responsible": 8,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 22,
+    "fields": {
+      "checked_out_at": "2026-11-18T09:30:00-03:00",
+      "returned_at": "2026-11-18T11:00:00-03:00",
+      "checkout_operator": 2,
+      "key": 12,
+      "responsible": 6,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 23,
+    "fields": {
+      "checked_out_at": "2026-11-18T18:20:00-03:00",
+      "returned_at": "2026-11-18T22:00:00-03:00",
+      "checkout_operator": 3,
+      "key": 11,
+      "responsible": 12,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 24,
+    "fields": {
+      "checked_out_at": "2026-11-18T18:20:00-03:00",
+      "returned_at": "2026-11-18T20:10:00-03:00",
+      "checkout_operator": 1,
+      "key": 9,
+      "responsible": 8,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 25,
+    "fields": {
+      "checked_out_at": "2026-11-19T10:05:00-03:00",
+      "returned_at": "2026-11-19T10:55:00-03:00",
+      "checkout_operator": 3,
+      "key": 10,
+      "responsible": 12,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 26,
+    "fields": {
+      "checked_out_at": "2026-11-19T10:20:00-03:00",
+      "returned_at": "2026-11-19T11:10:00-03:00",
+      "checkout_operator": 1,
+      "key": 9,
+      "responsible": 5,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 27,
+    "fields": {
+      "checked_out_at": "2026-11-19T14:20:00-03:00",
+      "returned_at": "2026-11-19T17:20:00-03:00",
+      "checkout_operator": 2,
+      "key": 6,
+      "responsible": 6,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 28,
+    "fields": {
+      "checked_out_at": "2026-11-19T19:20:00-03:00",
+      "returned_at": "2026-11-19T22:20:00-03:00",
+      "checkout_operator": 2,
+      "key": 7,
+      "responsible": 4,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 29,
+    "fields": {
+      "checked_out_at": "2026-11-20T08:10:00-03:00",
+      "returned_at": "2026-11-20T09:50:00-03:00",
+      "checkout_operator": 1,
+      "key": 10,
+      "responsible": 8,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 30,
+    "fields": {
+      "checked_out_at": "2026-11-20T10:20:00-03:00",
+      "returned_at": "2026-11-20T14:00:00-03:00",
+      "checkout_operator": 3,
+      "key": 8,
+      "responsible": 6,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 31,
+    "fields": {
+      "checked_out_at": "2026-11-20T13:30:00-03:00",
+      "returned_at": "2026-11-20T14:20:00-03:00",
+      "checkout_operator": 2,
+      "key": 4,
+      "responsible": 12,
+      "return_operator": 2
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 32,
+    "fields": {
+      "checked_out_at": "2026-11-20T14:10:00-03:00",
+      "returned_at": "2026-11-20T15:00:00-03:00",
+      "checkout_operator": 1,
+      "key": 1,
+      "responsible": 11,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 33,
+    "fields": {
+      "checked_out_at": "2026-11-20T14:20:00-03:00",
+      "returned_at": "2026-11-20T17:20:00-03:00",
+      "checkout_operator": 2,
+      "key": 4,
+      "responsible": 5,
+      "return_operator": 1
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 34,
+    "fields": {
+      "checked_out_at": "2026-11-20T19:10:00-03:00",
+      "returned_at": "2026-11-20T20:50:00-03:00",
+      "checkout_operator": 3,
+      "key": 11,
+      "responsible": 9,
+      "return_operator": 3
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 35,
+    "fields": {
+      "checked_out_at": "2026-11-21T08:30:00-03:00",
+      "returned_at": null,
+      "checkout_operator": 2,
+      "key": 1,
+      "responsible": 6,
+      "return_operator": null
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 36,
+    "fields": {
+      "checked_out_at": "2026-11-21T08:00:00-03:00",
+      "returned_at": null,
+      "checkout_operator": 2,
+      "key": 2,
+      "responsible": 8,
+      "return_operator": null
+    }
+  },
+  {
+    "model": "keys.keyloan",
+    "pk": 37,
+    "fields": {
+      "checked_out_at": "2026-11-21T07:30:00-03:00",
+      "returned_at": null,
+      "checkout_operator": 2,
+      "key": 3,
+      "responsible": 5,
+      "return_operator": null
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 1,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-03T08:00:00-03:00",
+      "loan": 1,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 2,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-03T09:30:00-03:00",
+      "loan": 2,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 3,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-03T09:50:00-03:00",
+      "loan": 1,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 4,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-03T10:05:00-03:00",
+      "loan": 3,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 5,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-03T10:55:00-03:00",
+      "loan": 3,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 6,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-03T11:20:00-03:00",
+      "loan": 2,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 7,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-04T08:10:00-03:00",
+      "loan": 4,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 8,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-04T09:00:00-03:00",
+      "loan": 4,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 9,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-04T18:30:00-03:00",
+      "loan": 5,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 10,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-04T20:10:00-03:00",
+      "loan": 5,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 11,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-09T08:05:00-03:00",
+      "loan": 6,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 12,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-09T09:35:00-03:00",
+      "loan": 6,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 13,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-09T18:20:00-03:00",
+      "loan": 7,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 14,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-09T21:20:00-03:00",
+      "loan": 7,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 15,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-10T10:20:00-03:00",
+      "loan": 8,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 16,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-10T12:00:00-03:00",
+      "loan": 8,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 17,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-10T19:30:00-03:00",
+      "loan": 9,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 18,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-10T23:10:00-03:00",
+      "loan": 9,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 19,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-11T14:30:00-03:00",
+      "loan": 10,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 20,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-11T15:20:00-03:00",
+      "loan": 10,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 21,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-11T19:30:00-03:00",
+      "loan": 11,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 22,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-11T21:20:00-03:00",
+      "loan": 11,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 23,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-12T09:30:00-03:00",
+      "loan": 12,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 24,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-12T11:10:00-03:00",
+      "loan": 12,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 25,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-12T15:00:00-03:00",
+      "loan": 13,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 26,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-12T16:50:00-03:00",
+      "loan": 13,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 27,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-13T08:10:00-03:00",
+      "loan": 14,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 28,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-13T09:00:00-03:00",
+      "loan": 14,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 29,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-16T10:00:00-03:00",
+      "loan": 15,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 30,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-16T13:00:00-03:00",
+      "loan": 15,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 31,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-16T15:20:00-03:00",
+      "loan": 16,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 32,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-16T16:50:00-03:00",
+      "loan": 16,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 33,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T09:20:00-03:00",
+      "loan": 17,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 34,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-17T11:00:00-03:00",
+      "loan": 17,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 35,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T13:05:00-03:00",
+      "loan": 18,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 36,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T13:20:00-03:00",
+      "loan": 19,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 37,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T14:05:00-03:00",
+      "loan": 20,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 38,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-17T14:30:00-03:00",
+      "loan": 21,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 39,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-17T14:35:00-03:00",
+      "loan": 18,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 40,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-17T14:55:00-03:00",
+      "loan": 20,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 41,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-17T15:00:00-03:00",
+      "loan": 19,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 42,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-17T18:10:00-03:00",
+      "loan": 21,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 43,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-18T09:30:00-03:00",
+      "loan": 22,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 44,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-18T11:00:00-03:00",
+      "loan": 22,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 45,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-18T18:20:00-03:00",
+      "loan": 23,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 46,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-18T18:20:00-03:00",
+      "loan": 24,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 47,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-18T20:10:00-03:00",
+      "loan": 24,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 48,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-18T22:00:00-03:00",
+      "loan": 23,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 49,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-19T10:05:00-03:00",
+      "loan": 25,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 50,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-19T10:20:00-03:00",
+      "loan": 26,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 51,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-19T10:55:00-03:00",
+      "loan": 25,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 52,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-19T11:10:00-03:00",
+      "loan": 26,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 53,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-19T14:20:00-03:00",
+      "loan": 27,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 54,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-19T17:20:00-03:00",
+      "loan": 27,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 55,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-19T19:20:00-03:00",
+      "loan": 28,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 56,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-19T22:20:00-03:00",
+      "loan": 28,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 57,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T08:10:00-03:00",
+      "loan": 29,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 58,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-20T09:50:00-03:00",
+      "loan": 29,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 59,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T10:20:00-03:00",
+      "loan": 30,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 60,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T13:30:00-03:00",
+      "loan": 31,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 61,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-20T14:00:00-03:00",
+      "loan": 30,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 62,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T14:10:00-03:00",
+      "loan": 32,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 63,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T14:20:00-03:00",
+      "loan": 33,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 64,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-20T14:20:00-03:00",
+      "loan": 31,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 65,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-20T15:00:00-03:00",
+      "loan": 32,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 66,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-20T17:20:00-03:00",
+      "loan": 33,
+      "operator": 1
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 67,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-20T19:10:00-03:00",
+      "loan": 34,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 68,
+    "fields": {
+      "kind": "return",
+      "occurred_at": "2026-11-20T20:50:00-03:00",
+      "loan": 34,
+      "operator": 3
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 69,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-21T08:30:00-03:00",
+      "loan": 35,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 70,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-21T08:00:00-03:00",
+      "loan": 36,
+      "operator": 2
+    }
+  },
+  {
+    "model": "keys.keymovement",
+    "pk": 71,
+    "fields": {
+      "kind": "checkout",
+      "occurred_at": "2026-11-21T07:30:00-03:00",
+      "loan": 37,
+      "operator": 2
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 1,
+    "fields": {
+      "start_at": "2026-11-18T14:00:00-03:00",
+      "end_at": "2026-11-18T16:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-13T11:00:00-03:00",
+      "cancelled_at": null,
+      "space": 5,
+      "user": 7
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 2,
+    "fields": {
+      "start_at": "2026-11-17T16:00:00-03:00",
+      "end_at": "2026-11-17T18:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-13T15:00:00-03:00",
+      "cancelled_at": null,
+      "space": 9,
+      "user": 6
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 3,
+    "fields": {
+      "start_at": "2026-11-19T14:00:00-03:00",
+      "end_at": "2026-11-19T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-14T08:00:00-03:00",
+      "cancelled_at": null,
+      "space": 5,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 4,
+    "fields": {
+      "start_at": "2026-11-18T14:00:00-03:00",
+      "end_at": "2026-11-18T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-14T13:00:00-03:00",
+      "cancelled_at": null,
+      "space": 2,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 5,
+    "fields": {
+      "start_at": "2026-11-18T09:00:00-03:00",
+      "end_at": "2026-11-18T10:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-15T06:00:00-03:00",
+      "cancelled_at": null,
+      "space": 9,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 6,
+    "fields": {
+      "start_at": "2026-11-18T13:00:00-03:00",
+      "end_at": "2026-11-18T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-15T12:00:00-03:00",
+      "cancelled_at": null,
+      "space": 3,
+      "user": 7
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 7,
+    "fields": {
+      "start_at": "2026-11-17T19:00:00-03:00",
+      "end_at": "2026-11-17T21:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-15T15:00:00-03:00",
+      "cancelled_at": null,
+      "space": 6,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 8,
+    "fields": {
+      "start_at": "2026-11-18T09:00:00-03:00",
+      "end_at": "2026-11-18T11:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-16T03:00:00-03:00",
+      "cancelled_at": null,
+      "space": 6,
+      "user": 6
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 9,
+    "fields": {
+      "start_at": "2026-11-20T09:00:00-03:00",
+      "end_at": "2026-11-20T11:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-16T04:00:00-03:00",
+      "cancelled_at": null,
+      "space": 3,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 10,
+    "fields": {
+      "start_at": "2026-11-18T08:00:00-03:00",
+      "end_at": "2026-11-18T09:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-16T05:00:00-03:00",
+      "cancelled_at": null,
+      "space": 3,
+      "user": 5
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 11,
+    "fields": {
+      "start_at": "2026-11-20T16:00:00-03:00",
+      "end_at": "2026-11-20T18:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-16T13:00:00-03:00",
+      "cancelled_at": null,
+      "space": 5,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 12,
+    "fields": {
+      "start_at": "2026-11-18T19:00:00-03:00",
+      "end_at": "2026-11-18T21:00:00-03:00",
+      "status": "cancelled",
+      "created_at": "2026-11-16T14:00:00-03:00",
+      "cancelled_at": "2026-11-16T19:00:00-03:00",
+      "space": 4,
+      "user": 5
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 13,
+    "fields": {
+      "start_at": "2026-11-23T15:00:00-03:00",
+      "end_at": "2026-11-23T17:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-18T10:00:00-03:00",
+      "cancelled_at": null,
+      "space": 6,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 14,
+    "fields": {
+      "start_at": "2026-11-23T14:00:00-03:00",
+      "end_at": "2026-11-23T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-18T11:00:00-03:00",
+      "cancelled_at": null,
+      "space": 6,
+      "user": 6
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 15,
+    "fields": {
+      "start_at": "2026-11-20T16:00:00-03:00",
+      "end_at": "2026-11-20T17:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-18T12:00:00-03:00",
+      "cancelled_at": null,
+      "space": 6,
+      "user": 5
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 16,
+    "fields": {
+      "start_at": "2026-11-23T08:00:00-03:00",
+      "end_at": "2026-11-23T09:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-19T04:00:00-03:00",
+      "cancelled_at": null,
+      "space": 5,
+      "user": 6
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 17,
+    "fields": {
+      "start_at": "2026-11-24T10:30:00-03:00",
+      "end_at": "2026-11-24T11:30:00-03:00",
+      "status": "cancelled",
+      "created_at": "2026-11-19T09:00:00-03:00",
+      "cancelled_at": "2026-11-20T06:00:00-03:00",
+      "space": 1,
+      "user": 5
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 18,
+    "fields": {
+      "start_at": "2026-11-23T13:00:00-03:00",
+      "end_at": "2026-11-23T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-19T11:00:00-03:00",
+      "cancelled_at": null,
+      "space": 4,
+      "user": 5
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 19,
+    "fields": {
+      "start_at": "2026-11-23T13:00:00-03:00",
+      "end_at": "2026-11-23T14:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-19T12:00:00-03:00",
+      "cancelled_at": null,
+      "space": 8,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 20,
+    "fields": {
+      "start_at": "2026-11-24T11:00:00-03:00",
+      "end_at": "2026-11-24T12:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-20T09:00:00-03:00",
+      "cancelled_at": null,
+      "space": 1,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 21,
+    "fields": {
+      "start_at": "2026-11-23T08:00:00-03:00",
+      "end_at": "2026-11-23T09:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T03:00:00-03:00",
+      "cancelled_at": null,
+      "space": 8,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 22,
+    "fields": {
+      "start_at": "2026-11-24T10:00:00-03:00",
+      "end_at": "2026-11-24T11:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T06:00:00-03:00",
+      "cancelled_at": null,
+      "space": 1,
+      "user": 5
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 23,
+    "fields": {
+      "start_at": "2026-11-25T11:00:00-03:00",
+      "end_at": "2026-11-25T12:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T07:00:00-03:00",
+      "cancelled_at": null,
+      "space": 1,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 24,
+    "fields": {
+      "start_at": "2026-11-23T15:00:00-03:00",
+      "end_at": "2026-11-23T16:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space": 9,
+      "user": 7
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 25,
+    "fields": {
+      "start_at": "2026-11-26T08:00:00-03:00",
+      "end_at": "2026-11-26T09:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space": 8,
+      "user": 6
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 26,
+    "fields": {
+      "start_at": "2026-11-26T11:00:00-03:00",
+      "end_at": "2026-11-26T12:00:00-03:00",
+      "status": "cancelled",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": "2026-11-21T13:00:00-03:00",
+      "space": 9,
+      "user": 6
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 27,
+    "fields": {
+      "start_at": "2026-11-26T11:00:00-03:00",
+      "end_at": "2026-11-26T12:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space": 3,
+      "user": 4
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 28,
+    "fields": {
+      "start_at": "2026-11-26T14:00:00-03:00",
+      "end_at": "2026-11-26T15:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space": 9,
+      "user": 6
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 29,
+    "fields": {
+      "start_at": "2026-11-26T15:00:00-03:00",
+      "end_at": "2026-11-26T17:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space": 9,
+      "user": 5
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 30,
+    "fields": {
+      "start_at": "2026-11-26T19:00:00-03:00",
+      "end_at": "2026-11-26T20:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space": 3,
+      "user": 5
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 31,
+    "fields": {
+      "start_at": "2026-11-30T08:00:00-03:00",
+      "end_at": "2026-11-30T10:00:00-03:00",
+      "status": "active",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": null,
+      "space": 3,
+      "user": 6
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 32,
+    "fields": {
+      "start_at": "2026-11-30T19:00:00-03:00",
+      "end_at": "2026-11-30T20:00:00-03:00",
+      "status": "cancelled",
+      "created_at": "2026-11-21T08:00:00-03:00",
+      "cancelled_at": "2026-11-21T13:00:00-03:00",
+      "space": 9,
+      "user": 4
+    }
+  }
+]

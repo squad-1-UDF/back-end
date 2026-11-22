@@ -24,6 +24,8 @@ include = ["config*", "apps*"]
 [tool.ruff]
 line-length = 88
 target-version = "py313"
+# Material do squad de dados copiado como entregue (scripts geradores).
+extend-exclude = ["docs/dados"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
