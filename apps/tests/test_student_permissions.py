@@ -27,7 +27,9 @@ from rest_framework.test import APIClient
 )
 def test_student_is_forbidden_before_domain_lookup(method, name, args, payload):
     client = APIClient()
-    client.force_authenticate(user=SimpleNamespace(is_authenticated=True, is_staff=False))
+    client.force_authenticate(
+        user=SimpleNamespace(is_authenticated=True, is_staff=False)
+    )
     url = reverse(name, args=args)
     response = getattr(client, method)(url, payload, format="json")
     assert response.status_code == 403
