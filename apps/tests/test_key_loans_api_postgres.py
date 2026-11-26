@@ -220,8 +220,10 @@ def test_authentication_staff_permission_and_csrf(actors):
     ordinary_client = Client(enforce_csrf_checks=True)
     assert ordinary_client.login(username=ordinary.username, password="senha-forte-789")
     assert ordinary_client.get(reverse("auth-csrf")).status_code == 204
-    assert ordinary_client.get(availability_url).status_code == 200
-    assert ordinary_client.get(movements_url).status_code == 200
+    for url in (availability_url, movements_url):
+        response = ordinary_client.get(url)
+        assert response.status_code == 403
+        assert response.json()["error"]["code"] == "FORBIDDEN"
     for url, payload in (
         (checkout_url, {"key_id": key.pk, "responsible_user_id": responsible.pk}),
         (return_url, {}),

@@ -38,21 +38,21 @@ Regras: `username` e `email` são únicos sem diferenciar maiúsculas (`409 DUPL
 | `POST /spaces/` | `{"code":"LAB-01","kind":"laboratory"}`; opcionais `name`, `capacity`, `location`, `is_active` | `201 {"id":1,"code":"LAB-01","kind":"laboratory","name":"Laboratório de Redes","capacity":30,"location":"Bloco B","is_active":true}` | Staff + CSRF |
 | `GET /spaces/{space_id}/` | Sem corpo | `200` com espaço no formato acima | Autenticado |
 | `PATCH /spaces/{space_id}/` | JSON parcial, por exemplo `{"code":"LAB-02"}` ou `{"is_active":false}` | `200` com espaço no formato acima | Staff + CSRF |
-| `POST /bookings/` | `{"space_id":1,"start_at":"2026-11-20T10:00:00-03:00","end_at":"2026-11-20T11:00:00-03:00"}` | `201 {"id":5,"space_id":1,"start_at":"...","end_at":"...","status":"active","created_at":"...","cancelled_at":null}` | Autenticado + CSRF; titular é a sessão |
-| `GET /bookings/` | Sem corpo; filtros opcionais `space_id`, `status`, `scope`, `limit`, `offset` | `200` com lista de reservas no formato acima | Por padrão, só próprias; `scope=all` exige staff |
-| `GET /bookings/{booking_id}/` | Sem corpo | `200` com reserva no formato acima | Titular ou staff |
-| `POST /bookings/{booking_id}/cancel/` | `{}` | `200 {"id":5,"status":"cancelled","cancelled_at":"..."}` | Titular ou staff + CSRF |
+| `POST /bookings/` | `{"space_id":1,"start_at":"2026-11-20T10:00:00-03:00","end_at":"2026-11-20T11:00:00-03:00"}` | `201 {"id":5,"space_id":1,"start_at":"...","end_at":"...","status":"active","created_at":"...","cancelled_at":null}` | Staff + CSRF; titular é a sessão |
+| `GET /bookings/` | Sem corpo; filtros opcionais `space_id`, `status`, `scope`, `limit`, `offset` | `200` com lista de reservas no formato acima | Staff; por padrão, só próprias; `scope=all` lista todas |
+| `GET /bookings/{booking_id}/` | Sem corpo | `200` com reserva no formato acima | Staff |
+| `POST /bookings/{booking_id}/cancel/` | `{}` | `200 {"id":5,"status":"cancelled","cancelled_at":"..."}` | Staff + CSRF |
 | `GET /spaces/{space_id}/booking-availability/?start_at=...&end_at=...` | Query com intervalo ISO 8601 e offset | `200 {"space_id":1,"start_at":"...","end_at":"...","available":false}` | Autenticado |
 | `GET /spaces/{space_id}/booking-agenda/?start_at=...&end_at=...` | Mesma query | `200 {"space_id":1,"start_at":"...","end_at":"...","occupied":[{"start_at":"...","end_at":"..."}]}` | Autenticado |
-| `GET /keys/` | Sem corpo; filtros opcionais `space_id`, `status`, `has_active_loan=true\|false` | `200 [KeyOut]` (ou `[]`), por `id` | Autenticado |
+| `GET /keys/` | Sem corpo; filtros opcionais `space_id`, `status`, `has_active_loan=true\|false` | `200 [KeyOut]` (ou `[]`), por `id` | Staff |
 | `POST /keys/` | `{"space_id":1,"label":"LAB-01-A"}`; opcional `"status"` | `201 KeyOut` | Staff + CSRF |
-| `GET /keys/{key_id}/` | Sem corpo | `200 KeyOut` | Autenticado |
+| `GET /keys/{key_id}/` | Sem corpo | `200 KeyOut` | Staff |
 | `PATCH /keys/{key_id}/` | JSON parcial com `label`, `status` e/ou `space_id` | `200 KeyOut` | Staff + CSRF |
 | `GET /key-loans/` | Sem corpo; filtros opcionais `status=active\|returned`, `key_id`, `space_id`, `responsible_user_id`, `limit` (1–100, padrão 100), `offset` | `200 [LoanOut]`, mais recentes primeiro | Staff |
 | `POST /key-loans/` | `{"key_id":2,"responsible_user_id":7}` | `201 {"id":9,"key_id":2,"key_label":"LAB-01-A","space_id":1,"space_code":"LAB-01","responsible_user_id":7,"responsible_name":"Ana Costa","checkout_operator_id":3,"checked_out_at":"...","returned_at":null,"return_operator_id":null,"status":"active"}` | Staff + CSRF |
 | `POST /key-loans/{loan_id}/return/` | `{}` | `200 LoanOut` com `returned_at`, `return_operator_id` e `"status":"returned"` | Staff + CSRF |
-| `GET /keys/{key_id}/loan-availability/` | Sem corpo | `200 {"key_id":2,"has_active_loan":true}` | Autenticado |
-| `GET /keys/{key_id}/movements/` | Sem corpo | `200 {"key_id":2,"events":[{"type":"checkout","loan_id":9,"occurred_at":"..."},{"type":"return","loan_id":9,"occurred_at":"..."}]}` | Autenticado |
+| `GET /keys/{key_id}/loan-availability/` | Sem corpo | `200 {"key_id":2,"has_active_loan":true}` | Staff |
+| `GET /keys/{key_id}/movements/` | Sem corpo | `200 {"key_id":2,"events":[{"type":"checkout","loan_id":9,"occurred_at":"..."},{"type":"return","loan_id":9,"occurred_at":"..."}]}` | Staff |
 
 ### Chaves e empréstimos
 

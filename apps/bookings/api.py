@@ -6,9 +6,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from rest_framework import serializers, status
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound
 from rest_framework.parsers import JSONParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -70,14 +70,13 @@ class BookingAPIView(APIView):
 
 @method_decorator(csrf_protect, name="dispatch")
 class BookingListCreateView(BookingAPIView):
+    permission_classes = (IsAuthenticated, IsAdminUser)
     http_method_names = ("get", "post", "options")
 
     def get(self, request):
         filters = BookingFilters(data=request.query_params)
         filters.is_valid(raise_exception=True)
         values = filters.validated_data
-        if values["scope"] == "all" and not request.user.is_staff:
-            raise PermissionDenied
         bookings = Booking.objects.all()
         if values["scope"] == "mine":
             bookings = bookings.filter(user=request.user)
@@ -114,27 +113,23 @@ class BookingListCreateView(BookingAPIView):
 
 
 class BookingDetailView(BookingAPIView):
+    permission_classes = (IsAuthenticated, IsAdminUser)
     http_method_names = ("get", "options")
 
     def get(self, request, booking_id):
-        bookings = Booking.objects.all()
-        if not request.user.is_staff:
-            bookings = bookings.filter(user=request.user)
-        booking = get_object_or_404(bookings, pk=booking_id)
+        booking = get_object_or_404(Booking, pk=booking_id)
         return Response(BookingResponse(booking).data)
 
 
 @method_decorator(csrf_protect, name="dispatch")
 class BookingCancelView(BookingAPIView):
+    permission_classes = (IsAuthenticated, IsAdminUser)
     http_method_names = ("post", "options")
 
     def post(self, request, booking_id):
         if not request._request.body or request.data != {}:
             raise serializers.ValidationError("Envie um objeto JSON vazio.")
-        bookings = Booking.objects.all()
-        if not request.user.is_staff:
-            bookings = bookings.filter(user=request.user)
-        get_object_or_404(bookings, pk=booking_id)
+        get_object_or_404(Booking, pk=booking_id)
         try:
             booking = cancel_booking(booking_id=booking_id, actor=request.user)
         except BookingNotVisible:
