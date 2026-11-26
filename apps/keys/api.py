@@ -39,13 +39,7 @@ def duplicate_label_error():
 
 
 class KeyAPIView(LoanAPIView):
-    def get_permissions(self):
-        permissions = (
-            (IsAuthenticated, IsAdminUser)
-            if self.request.method in ("POST", "PATCH")
-            else (IsAuthenticated,)
-        )
-        return [permission() for permission in permissions]
+    permission_classes = (IsAuthenticated, IsAdminUser)
 
 
 @method_decorator(csrf_protect, name="dispatch")

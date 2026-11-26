@@ -152,7 +152,10 @@ def test_mvp_end_to_end_with_real_sessions_and_csrf():
 
     booking_list_url = reverse("bookings-list")
     booking_payload = {"space_id": space_id, "start_at": START, "end_at": END}
-    created_booking = write_json(regular, "post", booking_list_url, booking_payload)
+    error_code(
+        write_json(regular, "post", booking_list_url, booking_payload), 403, "FORBIDDEN"
+    )
+    created_booking = write_json(staff, "post", booking_list_url, booking_payload)
     assert created_booking.status_code == 201
     booking = created_booking.json()
     booking_id = booking["id"]
@@ -170,11 +173,15 @@ def test_mvp_end_to_end_with_real_sessions_and_csrf():
         "active",
         None,
     )
-    assert Booking.objects.get(pk=booking_id).user_id == regular_user.pk
-    assert regular.get(booking_list_url).json() == [booking]
-    assert regular.get(reverse("bookings-detail", args=[booking_id])).json() == booking
+    assert Booking.objects.get(pk=booking_id).user_id == staff_user.pk
+    error_code(regular.get(booking_list_url), 403, "FORBIDDEN")
+    error_code(
+        regular.get(reverse("bookings-detail", args=[booking_id])), 403, "FORBIDDEN"
+    )
+    assert staff.get(booking_list_url).json() == [booking]
+    assert staff.get(reverse("bookings-detail", args=[booking_id])).json() == booking
 
-    conflict = write_json(regular, "post", booking_list_url, booking_payload)
+    conflict = write_json(staff, "post", booking_list_url, booking_payload)
     assert error_code(conflict, 409, "BOOKING_CONFLICT")["details"] == {
         "space_id": space_id
     }
@@ -195,8 +202,13 @@ def test_mvp_end_to_end_with_real_sessions_and_csrf():
         "occupied": [{"start_at": booking["start_at"], "end_at": booking["end_at"]}],
     }
 
+    error_code(
+        write_json(regular, "post", reverse("bookings-cancel", args=[booking_id]), {}),
+        403,
+        "FORBIDDEN",
+    )
     cancelled = write_json(
-        regular, "post", reverse("bookings-cancel", args=[booking_id]), {}
+        staff, "post", reverse("bookings-cancel", args=[booking_id]), {}
     )
     assert cancelled.status_code == 200
     assert cancelled.json()["id"] == booking_id
@@ -247,7 +259,8 @@ def test_mvp_end_to_end_with_real_sessions_and_csrf():
     assert KeyLoan.objects.get(pk=loan["id"]).checkout_operator_id == staff_user.pk
     key_availability_url = reverse("key-loan-availability", args=[key.pk])
     movements_url = reverse("key-movements", args=[key.pk])
-    assert regular.get(key_availability_url).json() == {
+    error_code(regular.get(key_availability_url), 403, "FORBIDDEN")
+    assert staff.get(key_availability_url).json() == {
         "key_id": key.pk,
         "has_active_loan": True,
     }
@@ -265,8 +278,10 @@ def test_mvp_end_to_end_with_real_sessions_and_csrf():
     assert returned.json()["id"] == loan["id"]
     assert returned.json()["status"] == "returned"
     assert returned.json()["returned_at"]
-    assert regular.get(key_availability_url).json()["has_active_loan"] is False
-    history = regular.get(movements_url)
+    error_code(regular.get(key_availability_url), 403, "FORBIDDEN")
+    error_code(regular.get(movements_url), 403, "FORBIDDEN")
+    assert staff.get(key_availability_url).json()["has_active_loan"] is False
+    history = staff.get(movements_url)
     assert history.status_code == 200
     assert history.json()["key_id"] == key.pk
     events = history.json()["events"]

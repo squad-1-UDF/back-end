@@ -63,14 +63,14 @@ Exclusão, desativação, perfis, recuperação de senha e campos de login defin
 
 | Método e caminho propostos | Parâmetros e JSON de entrada ilustrativo | Resposta de sucesso ilustrativa | Acesso | Erros principais |
 |---|---|---|---|---|
-| `GET /api/v1/keys/` | Sem corpo; filtros por espaço a decidir. | `200 [{"id":"k1","space_id":"s1"}]`. | Autenticado | `403`. |
-| `POST /api/v1/keys/` | `{"space_id":"s1"}`; identificação da chave a definir. | `201 {"id":"k1","space_id":"s1"}`. | Autenticado; gestão a definir | `400`, `403`, `404` espaço inexistente, `409` se houver unicidade acordada. |
-| `GET /api/v1/keys/{key_id}/` | `key_id`; sem corpo. | `200 {"id":"k1","space_id":"s1"}`. | Autenticado | `403`, `404`. |
-| `PATCH /api/v1/keys/{key_id}/` | `key_id`; `{"space_id":"s2"}`. | `200 {"id":"k1","space_id":"s2"}`. | Autenticado; gestão a definir | `400`, `403`, `404`, `409` se empréstimo/histórico impedir mudança. |
+| `GET /api/v1/keys/` | Sem corpo; filtros por espaço a decidir. | `200 [{"id":"k1","space_id":"s1"}]`. | Staff | `403`. |
+| `POST /api/v1/keys/` | `{"space_id":"s1"}`; identificação da chave a definir. | `201 {"id":"k1","space_id":"s1"}`. | Staff e CSRF | `400`, `403`, `404` espaço inexistente, `409` se houver unicidade acordada. |
+| `GET /api/v1/keys/{key_id}/` | `key_id`; sem corpo. | `200 {"id":"k1","space_id":"s1"}`. | Staff | `403`, `404`. |
+| `PATCH /api/v1/keys/{key_id}/` | `key_id`; `{"space_id":"s2"}`. | `200 {"id":"k1","space_id":"s2"}`. | Staff e CSRF | `400`, `403`, `404`, `409` se empréstimo/histórico impedir mudança. |
 | `POST /api/v1/key-loans/` (UC005, implementado) | `{"key_id":1,"responsible_user_id":7}`; inteiros positivos. Horário e operador vêm do servidor. | `201 {"id":5,"key_id":1,"responsible_user_id":7,"checked_out_at":"2026-10-30T10:00:00-03:00","status":"active"}`. | Sessão staff e CSRF | `400`, `403`, `404`, `409 KEY_UNAVAILABLE` se houver empréstimo ativo. |
 | `POST /api/v1/key-loans/{loan_id}/return/` (UC006, implementado) | `loan_id` inteiro; corpo JSON `{}`. Horário e operador vêm do servidor. | `200 {"id":5,"returned_at":"2026-10-30T11:00:00-03:00","status":"returned"}`. | Sessão staff e CSRF | `400`, `403`, `404` empréstimo inexistente, `409 LOAN_ALREADY_RETURNED`. |
-| `GET /api/v1/keys/{key_id}/loan-availability/` (UC007, implementado) | `key_id` inteiro; sem corpo. | `200 {"key_id":1,"has_active_loan":true}`; sem empréstimo, `false`. | Sessão autenticada | `403`, `404`. |
-| `GET /api/v1/keys/{key_id}/movements/` (UC008, implementado) | `key_id` inteiro; sem corpo. Filtros/paginação pendentes. | `200 {"key_id":1,"events":[{"type":"checkout","loan_id":5,"occurred_at":"2026-10-30T10:00:00-03:00"},{"type":"return","loan_id":5,"occurred_at":"2026-10-30T11:00:00-03:00"}]}`. | Sessão autenticada | `403`, `404`. |
+| `GET /api/v1/keys/{key_id}/loan-availability/` (UC007, implementado) | `key_id` inteiro; sem corpo. | `200 {"key_id":1,"has_active_loan":true}`; sem empréstimo, `false`. | Sessão staff | `403`, `404`. |
+| `GET /api/v1/keys/{key_id}/movements/` (UC008, implementado) | `key_id` inteiro; sem corpo. Filtros/paginação pendentes. | `200 {"key_id":1,"events":[{"type":"checkout","loan_id":5,"occurred_at":"2026-10-30T10:00:00-03:00"},{"type":"return","loan_id":5,"occurred_at":"2026-10-30T11:00:00-03:00"}]}`. | Sessão staff | `403`, `404`. |
 | `GET /api/v1/keys/{key_id}/history-report/` (UC009, P3) | `key_id`; formato e período a decidir. | **Exemplo JSON provisório:** `200 {"key_id":"k1","events":[{"loan_id":"l1","type":"checkout"}]}`. Arquivo/exportação ainda não definidos. | Autenticado; permissão de emissão a definir | `400`, `403`, `404`. |
 
 `loan-availability` expõe **somente ausência/presença de empréstimo ativo**. Não afirma que a chave existe fisicamente, está liberada administrativamente ou pode ser entregue. A retirada revalida o histórico na transação; um `GET` anterior não reserva a chave. A devolução preserva a retirada e registra evento vinculado ao empréstimo. O histórico é ordenado por horário e ID, contém apenas tipo, empréstimo e horário e não oferece alteração ou exclusão. Os erros HTTP de UC005–UC008 usam `error.code` e `error.message`; erros `400` também incluem `error.details`. Falhas de CSRF mantêm a resposta de UC001: `403 {"error":"CSRF inválido ou ausente."}`. Identificadores, autorização e formato de resposta das outras rotas continuam sujeitos à integração com o Front-end.
@@ -81,10 +81,10 @@ Estas rotas atendem à proposta de reservas do MVP; não fazem parte dos casos U
 
 | Método e caminho | Entrada | Resposta de sucesso | Acesso |
 |---|---|---|---|
-| `POST /api/v1/bookings/` | JSON com `space_id` inteiro, `start_at` e `end_at` | `201` com `id`, `space_id`, `start_at`, `end_at`, `status: "active"`, `created_at` e `cancelled_at: null` | Usuário autenticado; responsável é sempre a sessão |
-| `GET /api/v1/bookings/` | Filtros opcionais `space_id`, `status=active\|cancelled`, `scope=mine\|all`, `limit` e `offset` | `200` com lista dos mesmos campos, ordenada por início e ID | Por padrão somente próprias; `scope=all` exige staff |
-| `GET /api/v1/bookings/{booking_id}/` | ID inteiro | `200` com os campos da reserva | Titular ou staff; terceiros recebem `404` |
-| `POST /api/v1/bookings/{booking_id}/cancel/` | JSON `{}` | `200` com `id`, `status: "cancelled"` e `cancelled_at` | Titular ou staff; terceiros recebem `404` |
+| `POST /api/v1/bookings/` | JSON com `space_id` inteiro, `start_at` e `end_at` | `201` com `id`, `space_id`, `start_at`, `end_at`, `status: "active"`, `created_at` e `cancelled_at: null` | Staff; responsável é sempre a sessão |
+| `GET /api/v1/bookings/` | Filtros opcionais `space_id`, `status=active\|cancelled`, `scope=mine\|all`, `limit` e `offset` | `200` com lista dos mesmos campos, ordenada por início e ID | Staff; por padrão somente próprias; `scope=all` lista todas |
+| `GET /api/v1/bookings/{booking_id}/` | ID inteiro | `200` com os campos da reserva | Staff |
+| `POST /api/v1/bookings/{booking_id}/cancel/` | JSON `{}` | `200` com `id`, `status: "cancelled"` e `cancelled_at` | Staff |
 | `GET /api/v1/spaces/{space_id}/booking-availability/` | Query `start_at` e `end_at` | `200` com `space_id`, intervalo e `available` | Autenticado |
 | `GET /api/v1/spaces/{space_id}/booking-agenda/` | Query `start_at` e `end_at` | `200` com `space_id`, intervalo e `occupied: [{"start_at": "...", "end_at": "..."}]` | Autenticado |
 

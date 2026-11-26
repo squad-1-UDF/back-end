@@ -146,6 +146,7 @@ class ReturnView(LoanAPIView):
 
 
 class LoanAvailabilityView(LoanAPIView):
+    permission_classes = (IsAuthenticated, IsAdminUser)
     http_method_names = ("get", "options")
 
     def get(self, request, key_id):
@@ -154,6 +155,7 @@ class LoanAvailabilityView(LoanAPIView):
 
 
 class MovementsView(LoanAPIView):
+    permission_classes = (IsAuthenticated, IsAdminUser)
     http_method_names = ("get", "options")
 
     def get(self, request, key_id):

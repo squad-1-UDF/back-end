@@ -177,8 +177,8 @@ def test_database_checks_status_interval_cancellation_and_foreign_keys(domain):
 
 
 def test_http_create_read_availability_agenda_cancel_and_rebook(domain):
-    room, _, owner, _, _ = domain
-    client = client_for(owner)
+    room, _, _, _, staff = domain
+    client = client_for(staff)
     availability = window_url("booking-availability", room)
     agenda = window_url("booking-agenda", room)
     assert client.get(availability).json()["available"] is True
@@ -205,7 +205,7 @@ def test_http_create_read_availability_agenda_cancel_and_rebook(domain):
     )
     assert before <= datetime.fromisoformat(data["created_at"]) <= after
     booking = Booking.objects.get(pk=data["id"])
-    assert booking.user_id == owner.pk
+    assert booking.user_id == staff.pk
     assert client.get(availability).json()["available"] is False
     assert client.get(agenda).json()["occupied"] == [
         {"start_at": data["start_at"], "end_at": data["end_at"]}
@@ -267,8 +267,8 @@ def test_http_create_read_availability_agenda_cancel_and_rebook(domain):
     ],
 )
 def test_invalid_create_payload_returns_400_without_writes(domain, bad_payload):
-    _, _, owner, _, _ = domain
-    client = client_for(owner)
+    _, _, _, _, staff = domain
+    client = client_for(staff)
     response = post_json(client, reverse("bookings-list"), bad_payload)
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "INVALID_REQUEST"
@@ -276,8 +276,8 @@ def test_invalid_create_payload_returns_400_without_writes(domain, bad_payload):
 
 
 def test_missing_space_and_invalid_windows(domain):
-    room, _, owner, _, _ = domain
-    client = client_for(owner)
+    room, _, _, _, staff = domain
+    client = client_for(staff)
     missing = post_json(
         client,
         reverse("bookings-list"),
@@ -303,12 +303,12 @@ def test_missing_space_and_invalid_windows(domain):
 
 
 def test_authentication_csrf_and_method_limits(domain):
-    room, _, owner, _, _ = domain
+    room, _, owner, _, staff = domain
     anonymous = Client(enforce_csrf_checks=True)
     assert anonymous.get(reverse("bookings-list")).status_code == 403
     assert anonymous.get(window_url("booking-availability", room)).status_code == 403
     assert anonymous.get(window_url("booking-agenda", room)).status_code == 403
-    client = client_for(owner)
+    client = client_for(staff)
     assert (
         post_json(
             client, reverse("bookings-list"), payload(room), csrf=False
@@ -328,30 +328,26 @@ def test_authentication_csrf_and_method_limits(domain):
     assert Booking.objects.count() == 1
 
 
-def test_owner_staff_visibility_filters_and_private_responses(domain):
+def test_student_cannot_access_booking_records_but_can_read_occupancy(domain):
     room, lab, owner, other, staff = domain
     mine = create_booking(space=room, user=owner, start_at=START, end_at=END)
     theirs = create_booking(space=lab, user=other, start_at=START, end_at=END)
     owner_client = client_for(owner)
-    other_client = client_for(other)
     staff_client = client_for(staff)
-    assert [row["id"] for row in owner_client.get(reverse("bookings-list")).json()] == [
-        mine.pk
-    ]
-    assert [row["id"] for row in other_client.get(reverse("bookings-list")).json()] == [
-        theirs.pk
-    ]
-    assert (
-        owner_client.get(reverse("bookings-detail", args=[theirs.pk])).status_code
-        == 404
-    )
-    assert (
-        post_json(
-            owner_client, reverse("bookings-cancel", args=[theirs.pk]), {}
-        ).status_code
-        == 404
-    )
-    assert owner_client.get(reverse("bookings-list") + "?scope=all").status_code == 403
+    for response in (
+        owner_client.get(reverse("bookings-list")),
+        owner_client.get(reverse("bookings-list") + "?scope=all"),
+        owner_client.get(reverse("bookings-detail", args=[mine.pk])),
+        owner_client.get(reverse("bookings-detail", args=[theirs.pk])),
+        owner_client.get(reverse("bookings-detail", args=[theirs.pk + 999])),
+        post_json(owner_client, reverse("bookings-list"), payload(room)),
+        post_json(owner_client, reverse("bookings-cancel", args=[mine.pk]), {}),
+        post_json(owner_client, reverse("bookings-cancel", args=[theirs.pk]), {}),
+    ):
+        assert response.status_code == 403
+        assert response.json()["error"]["code"] == "FORBIDDEN"
+    assert Booking.objects.filter(pk=mine.pk, status="active").exists()
+    assert Booking.objects.filter(pk=theirs.pk, status="active").exists()
     assert staff_client.get(reverse("bookings-list")).json() == []
     all_rows = staff_client.get(reverse("bookings-list") + "?scope=all").json()
     assert {row["id"] for row in all_rows} == {mine.pk, theirs.pk}
@@ -393,8 +389,8 @@ def test_owner_staff_visibility_filters_and_private_responses(domain):
 
 
 def test_filters_and_cancellation_body_validation(domain):
-    room, _, owner, _, _ = domain
-    client = client_for(owner)
+    room, _, owner, _, staff = domain
+    client = client_for(staff)
     booking = create_booking(space=room, user=owner, start_at=START, end_at=END)
     for query in (
         "?space_id=bad",
@@ -420,9 +416,9 @@ def test_filters_and_cancellation_body_validation(domain):
 
 
 def test_adjacent_windows_and_other_spaces_are_available(domain):
-    room, lab, owner, _, _ = domain
+    room, lab, owner, _, staff = domain
     create_booking(space=room, user=owner, start_at=START, end_at=END)
-    client = client_for(owner)
+    client = client_for(staff)
     adjacent = window_url(
         "booking-availability", room, start=END, end=END + timedelta(hours=1)
     )
@@ -442,8 +438,8 @@ def test_adjacent_windows_and_other_spaces_are_available(domain):
 
 
 def test_query_limits_and_agenda_order(domain, monkeypatch):
-    room, _, owner, _, _ = domain
-    client = client_for(owner)
+    room, _, owner, _, staff = domain
+    client = client_for(staff)
     for hours in (2, 0, 1):
         create_booking(
             space=room,
@@ -457,7 +453,7 @@ def test_query_limits_and_agenda_order(domain, monkeypatch):
         START + timedelta(hours=hours) for hours in range(3)
     ]
     bookings_url = reverse("bookings-list")
-    page = client.get(bookings_url + "?limit=1&offset=1").json()
+    page = client.get(bookings_url + "?scope=all&limit=1&offset=1").json()
     assert len(page) == 1
     assert page[0]["start_at"] == occupied[1]["start_at"]
     for query in ("?limit=101", "?limit=0", "?offset=-1"):
@@ -477,6 +473,7 @@ def test_query_limits_and_agenda_order(domain, monkeypatch):
 @pytest.mark.django_db(transaction=True)
 def test_concurrent_http_bookings_one_wins(domain):
     room, _, owner, other, _ = domain
+    get_user_model().objects.filter(pk__in=[owner.pk, other.pk]).update(is_staff=True)
     clients = [client_for(owner), client_for(other)]
     gate = Barrier(2, timeout=10)
     url = reverse("bookings-list")
@@ -502,6 +499,7 @@ def test_concurrent_http_bookings_one_wins(domain):
 @pytest.mark.django_db(transaction=True)
 def test_concurrent_http_bookings_in_different_spaces_both_succeed(domain):
     room, lab, owner, other, _ = domain
+    get_user_model().objects.filter(pk__in=[owner.pk, other.pk]).update(is_staff=True)
     gate = Barrier(2, timeout=10)
     url = reverse("bookings-list")
 
@@ -527,6 +525,7 @@ def test_concurrent_http_bookings_in_different_spaces_both_succeed(domain):
 @pytest.mark.django_db(transaction=True)
 def test_concurrent_cancellations_preserve_one_cancellation(domain):
     room, _, owner, _, staff = domain
+    get_user_model().objects.filter(pk=owner.pk).update(is_staff=True)
     booking = create_booking(space=room, user=owner, start_at=START, end_at=END)
     clients = [client_for(owner), client_for(staff)]
     gate = Barrier(2, timeout=10)
@@ -555,8 +554,8 @@ def test_concurrent_cancellations_preserve_one_cancellation(domain):
 
 @pytest.mark.parametrize("error_type", [IntegrityError, OperationalError])
 def test_unexpected_database_error_is_not_conflict(domain, monkeypatch, error_type):
-    room, _, owner, _, _ = domain
-    client = client_for(owner, raise_request_exception=False)
+    room, _, _, _, staff = domain
+    client = client_for(staff, raise_request_exception=False)
 
     def fail(*args, **kwargs):
         raise error_type("falha inesperada")
@@ -568,9 +567,9 @@ def test_unexpected_database_error_is_not_conflict(domain, monkeypatch, error_ty
 
 
 def test_cancel_rolls_back_after_save_failure(domain, monkeypatch):
-    room, _, owner, _, _ = domain
+    room, _, owner, _, staff = domain
     booking = create_booking(space=room, user=owner, start_at=START, end_at=END)
-    client = client_for(owner, raise_request_exception=False)
+    client = client_for(staff, raise_request_exception=False)
     original_save = Booking.save
 
     def fail_after_save(self, *args, **kwargs):

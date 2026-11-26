@@ -110,13 +110,14 @@ def test_anonymous_cannot_read_or_write_keys_or_loans(spaces):
     assert Key.objects.get(pk=key.pk).label == "L1"
 
 
-def test_regular_user_reads_keys_but_cannot_write_or_list_loans(people, spaces):
+def test_regular_user_cannot_read_or_write_keys_or_loans(people, spaces):
     _, ordinary = people
     key = Key.objects.create(space=spaces[0], label="L1")
     client = login_client(ordinary)
-    assert client.get(reverse("keys-list")).status_code == 200
-    assert client.get(detail(key.pk)).status_code == 200
     for response in (
+        client.get(reverse("keys-list")),
+        client.get(detail(key.pk)),
+        client.get(detail(key.pk + 9999)),
         write(client, "post", reverse("keys-list"), {"space_id": 1, "label": "X"}),
         write(client, "patch", detail(key.pk), {"status": "lost"}),
         client.get(reverse("key-loans-checkout")),
@@ -351,7 +352,7 @@ def test_list_filters_and_active_loan(people, spaces):
     loan = checkout_key(
         key_id=k3.pk, responsible=ordinary, operator=staff, occurred_at=AT
     )
-    client = login_client(ordinary)
+    client = login_client(staff)
     url = reverse("keys-list")
 
     def ids(query=""):
@@ -399,8 +400,8 @@ def test_list_filters_and_active_loan(people, spaces):
     ],
 )
 def test_invalid_key_filters_return_400(people, query):
-    _, ordinary = people
-    response = login_client(ordinary).get(reverse("keys-list") + query)
+    staff, _ = people
+    response = login_client(staff).get(reverse("keys-list") + query)
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "INVALID_REQUEST"
 
